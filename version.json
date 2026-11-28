@@ -1,0 +1,6 @@
+{
+  "version": "4.0.0",
+  "releaseDate": "2026-11-28",
+  "notes": "NAVIXU3 V4.0: PWA install support, offline app shell, live weather intelligence, local drive assistant, refreshed dark-neon UI. Existing GPS, maps, routing, speedometer, trip history and settings retained.",
+  "url": "./"
+}
