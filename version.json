@@ -1,0 +1,6 @@
+{
+  "version": "4.1.0",
+  "releaseDate": "2026-11-28",
+  "notes": "R3PRO Phone Link preview added: local browser notification permission and test alert, remote Android notification relay clearly marked as requiring a companion app and secure backend. Existing navigation modules and storage identifiers preserved.",
+  "url": "./"
+}
