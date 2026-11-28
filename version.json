@@ -1,6 +1,0 @@
-{
-  "version": "4.4.0",
-  "releaseDate": "2026-11-28",
-  "notes": "R3PRO 4.4.0: dedicated LIVE WEATHER menu and interactive weather map page. Adds current conditions panel, GPS marker, latest available RainViewer radar overlay, weather alerts, refresh controls and periodic updates. Cloud cover is shown as location data, not satellite cloud imagery; thunderstorm risk is model probability, not live lightning detection.",
-  "url": "./"
-}
