@@ -1,6 +1,0 @@
-{
-  "version": "4.1.0",
-  "releaseDate": "2026-11-28",
-  "notes": "R3PRO 4.1.0: sinkronisasi versi aplikasi dan server diperbaiki; pemeriksaan versi memakai no-cache; Service Worker diperbarui; kegagalan pemeriksaan tidak mengunci aplikasi; seluruh data lokal dan modul lama dipertahankan. Phone Link preview tetap tersedia.",
-  "url": "./"
-}
