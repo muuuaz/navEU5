@@ -1,6 +1,0 @@
-{
-  "version": "4.3.0",
-  "releaseDate": "2026-11-28",
-  "notes": "R3PRO 4.3.0: Live Weather & Radar. Open-Meteo current weather, cloud cover, rain and hourly thunderstorm/rain probability; RainViewer latest radar overlay on SMART MAPS, periodic refresh, status and weather alerts. Weather model is periodically updated, radar coverage varies by region, and lightning is model probability rather than strike detection.",
-  "url": "./"
-}
