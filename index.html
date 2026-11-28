@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark" data-fx="full" data-racing="off">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<meta name="application-name" content="R3PRO ULTIMATE NAVIGATION">
+<meta name="theme-color" content="#050b16">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./navixu3-icon.svg" type="image/svg+xml">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="R3PRO INFINITY: GPS navigation, speedometer, Phone Link, live weather and radar map.">
+<title>R3PRO INFINITY V4.3.0 | Live Weather & Radar</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'">
+<style>
+:root{--bg:#030812;--bg2:#071426;--panel:#0a1b2e;--panel2:#0d2540;--line:#17506f;--text:#e8f8ff;--muted:#8fb0c4;--neon:#2fe9ff;--violet:#b36bff;--acid:#5cffb1;--hot:#ff4fd8;--warn:#ffc65c;--red:#ff4d6a;--rail:84px;--hdr:64px;--bottom:0px;--sh:0 10px 30px #0006,inset 0 0 24px #2fe9ff0a;--navbg:linear-gradient(180deg,#050d18f2,#071b2cf2 50%,#100b25f2);--nebula:radial-gradient(ellipse at 12% 10%,#0a4a6e66,transparent 42%),radial-gradient(ellipse at 90% 85%,#4a1a7a55,transparent 45%),linear-gradient(#02050c,#061223)}
+[data-theme=light]{--bg:#e8f1f8;--bg2:#ffffff;--panel:#ffffff;--panel2:#eef6fc;--line:#9cc3dc;--text:#0b2336;--muted:#42627a;--neon:#007db8;--violet:#7a3fd1;--acid:#0b9a63;--hot:#c2268f;--warn:#a86b00;--red:#d02a46;--sh:0 8px 22px #0b233618;--navbg:linear-gradient(180deg,#fff,#e9f3fa);--nebula:radial-gradient(ellipse at 10% 5%,#bfe3f7aa,transparent 45%),linear-gradient(#f2f8fc,#dfeaf3)}
+[data-racing=on]{--neon:#ff4d3d;--violet:#ffb020;--acid:#ffe14d;--line:#6b2430;--nebula:radial-gradient(ellipse at 12% 10%,#6e1a1a66,transparent 42%),radial-gradient(ellipse at 90% 85%,#7a4a1a55,transparent 45%),linear-gradient(#0a0305,#1a0a10)}
+[data-racing=on][data-theme=light]{--neon:#d6281a;--violet:#c27a00;--acid:#a18400;--line:#d9a3a3;--nebula:radial-gradient(ellipse at 10% 5%,#f7c9bfaa,transparent 45%),linear-gradient(#fcf3f1,#f1dfdb)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:0;background:var(--nebula)}
+body:after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(90deg,#2fe9ff0b 1px,transparent 1px),linear-gradient(#2fe9ff0b 1px,transparent 1px);background-size:30px 30px}
+[data-theme=light] body:after{opacity:.5}
+#galaxy{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel2),var(--panel));color:var(--text);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13px;transition:transform .15s,border-color .15s,box-shadow .15s}
+button:hover{border-color:var(--neon);box-shadow:0 0 14px color-mix(in srgb,var(--neon) 35%,transparent)}
+button:active{transform:scale(.97)}button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:linear-gradient(135deg,var(--neon),var(--violet));color:#02121c;border:0;text-shadow:none}
+[data-theme=light] button.primary{color:#fff}
+button.danger{border-color:#7d3443;background:#3b1c2b;color:#ffdce2}
+[data-theme=light] button.danger{background:#fde4e8;color:#8a1a2e}
+button.on{border-color:var(--neon);box-shadow:inset 0 0 14px color-mix(in srgb,var(--neon) 30%,transparent),0 0 12px color-mix(in srgb,var(--neon) 30%,transparent);color:var(--neon)}
+input,select{background:var(--bg2);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:11px;min-width:0}
+input:focus,select:focus{outline:none;border-color:var(--neon);box-shadow:0 0 12px color-mix(in srgb,var(--neon) 30%,transparent)}
+a{color:var(--neon)}
+/* layout */
+header{position:fixed;top:0;left:var(--rail);right:0;height:var(--hdr);z-index:60;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 max(16px,env(safe-area-inset-right)) 0 18px;background:color-mix(in srgb,var(--bg2) 88%,transparent);border-bottom:1px solid var(--line);box-shadow:0 5px 30px color-mix(in srgb,var(--neon) 12%,transparent)}
+.fx-full header,[data-fx=full] header{backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.08em}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,var(--neon),var(--violet));display:grid;place-items:center;font-size:20px;color:#02121c;box-shadow:0 0 22px color-mix(in srgb,var(--neon) 55%,transparent)}
+.sub{font-size:9px;color:var(--muted);letter-spacing:.2em}
+.hright{display:flex;align-items:center;gap:10px}
+.clock{text-align:right;font-variant-numeric:tabular-nums}.clock strong{font-size:19px}.clock small{display:block;color:var(--muted);font-size:10px}
+.pill{border:1px solid var(--line);border-radius:99px;padding:6px 11px;color:var(--muted);font-size:12px;display:flex;align-items:center;gap:7px;background:color-mix(in srgb,var(--panel) 70%,transparent)}
+.dot{width:8px;height:8px;border-radius:50%;background:#71879b;flex:none}.dot.ok{background:var(--acid);box-shadow:0 0 9px var(--acid)}.dot.warn{background:var(--warn);box-shadow:0 0 9px var(--warn)}.dot.bad{background:var(--red);box-shadow:0 0 9px var(--red)}
+.nav{position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:50;display:flex;flex-direction:column;gap:6px;padding:10px 8px calc(10px + env(safe-area-inset-bottom));background:var(--navbg);border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-brand{height:46px;min-height:46px;display:grid;place-items:center;border:1px solid var(--line);border-radius:13px;font-weight:900;letter-spacing:-1px;color:var(--neon);text-shadow:0 0 12px var(--neon);margin-bottom:6px}
+.nav button{width:100%;min-height:58px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:12px;box-shadow:none}
+.nav button b{font-size:21px;line-height:1;color:var(--neon);text-shadow:0 0 10px color-mix(in srgb,var(--neon) 50%,transparent)}
+.nav button:nth-of-type(4n+2) b{color:var(--violet)}.nav button:nth-of-type(4n+3) b{color:var(--acid)}.nav button:nth-of-type(4n+4) b{color:var(--hot)}
+.nav button small{font-size:8px;font-weight:900;letter-spacing:.07em}
+.nav button.selected{color:var(--text);border-color:var(--neon);background:color-mix(in srgb,var(--neon) 14%,var(--panel));box-shadow:inset 0 0 16px color-mix(in srgb,var(--neon) 20%,transparent)}
+.nav-foot{margin-top:auto;padding-top:8px;text-align:center;color:var(--acid);font:800 8px/1.7 ui-monospace,monospace;letter-spacing:.1em;border-top:1px solid var(--line)}
+main{position:fixed;top:var(--hdr);left:var(--rail);right:0;bottom:var(--bottom);z-index:1;overflow-y:auto;overflow-x:hidden;padding:clamp(12px,2vw,26px) clamp(12px,2.4vw,34px) 40px;scrollbar-color:var(--line) transparent}
+.page{display:none;max-width:1500px;margin:0 auto}
+.page.active{display:block;animation:pageIn .35s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}}
+.page.module-fs{position:fixed;inset:0;z-index:900;max-width:none;margin:0;overflow:auto;padding:12px;background:var(--bg)}
+.page.module-fs:before{content:"";position:fixed;inset:0;z-index:-1;background:var(--nebula)}
+.fs-exit{position:fixed;z-index:1500;right:max(7px,env(safe-area-inset-right));top:calc(7px + env(safe-area-inset-top));display:none;width:30px;height:30px;min-width:30px;padding:0;border-radius:9px;background:color-mix(in srgb,var(--panel) 88%,transparent);border-color:color-mix(in srgb,var(--neon) 65%,transparent);color:var(--neon);font-size:12px;line-height:1;box-shadow:0 2px 10px #0005;opacity:.82;backdrop-filter:blur(8px)}
+.fs-exit:hover{opacity:1}.module-fs{scroll-padding-top:42px}
+body.fs-on .fs-exit{display:block}
+/* common blocks */
+.ph{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:clamp(14px,2.4vw,26px);border:1px solid var(--line);border-radius:18px;background:linear-gradient(110deg,var(--panel),var(--panel2) 60%,var(--panel));box-shadow:var(--sh)}
+.ph:after{content:"";position:absolute;left:-30%;top:0;width:26%;height:100%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--neon) 14%,transparent),transparent);transform:skewX(-22deg);animation:sweep 8s linear infinite;pointer-events:none}
+@keyframes sweep{to{left:130%}}
+.eyebrow{color:var(--neon);font:800 10px ui-monospace,monospace;letter-spacing:.2em}
+.ph h1{font-size:clamp(22px,3.6vw,38px);letter-spacing:.07em;margin:5px 0;background:linear-gradient(90deg,var(--text),var(--neon) 50%,var(--violet) 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ph p{margin:0;color:var(--muted);font-size:13px}
+.ph-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;z-index:1}
+.ph-tools button{padding:8px 10px;font:800 10px ui-monospace,monospace;letter-spacing:.05em}
+.tag{white-space:nowrap;border:1px solid var(--line);color:var(--neon);border-radius:30px;padding:8px 12px;font:800 10px ui-monospace,monospace;letter-spacing:.1em}
+.tag i{display:inline-block;width:7px;height:7px;background:var(--acid);border-radius:50%;margin-right:6px;box-shadow:0 0 10px var(--acid)}
+.card{position:relative;background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:clamp(14px,2vw,24px);box-shadow:var(--sh);min-width:0}
+.card h2{font-size:15px;margin:0 0 14px;letter-spacing:.08em;color:var(--text)}
+.muted{color:var(--muted)}.note{font-size:11px;color:var(--muted);line-height:1.6;margin:12px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>input{flex:1;min-width:130px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.metric{background:color-mix(in srgb,var(--bg2) 85%,transparent);border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}
+.metric small{display:block;color:var(--muted);font:800 8px ui-monospace,monospace;letter-spacing:.13em}
+.metric strong{display:block;margin-top:6px;font:900 clamp(13px,1.8vw,17px) ui-monospace,monospace;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.grid{display:grid;gap:10px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s,border-color .2s,box-shadow .2s}
+[data-fx=full] .card:before,[data-fx=full] .tile:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(120deg,color-mix(in srgb,var(--neon) 55%,transparent),transparent 35%,color-mix(in srgb,var(--violet) 50%,transparent) 70%,color-mix(in srgb,var(--acid) 45%,transparent));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+/* home */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.tile{position:relative;min-height:140px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:16px;background:linear-gradient(145deg,var(--panel2),var(--panel))}
+.tile b{font-size:32px;color:var(--neon);text-shadow:0 0 14px color-mix(in srgb,var(--neon) 55%,transparent)}
+.tile:nth-child(3n+2) b{color:var(--violet)}.tile:nth-child(3n) b{color:var(--acid)}
+.tile strong{font-size:13px;letter-spacing:.07em}.tile small{color:var(--muted);font-weight:500}.tile span{margin-top:auto;color:var(--neon);font:800 9px ui-monospace,monospace;letter-spacing:.16em}
+.hero3{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px}
+.hero3 .big strong{font-size:clamp(30px,5vw,54px);color:var(--neon);text-shadow:0 0 18px color-mix(in srgb,var(--neon) 50%,transparent)}
+.term{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:#020b12;padding:14px;color:#72d8ac;font:12px ui-monospace,monospace;min-height:120px}
+[data-theme=light] .term{background:#0b1d2a}
+.term p{margin:5px 0}.term-head{display:flex;justify-content:space-between;color:#5acbff;border-bottom:1px solid #17435b;padding-bottom:8px;margin-bottom:8px}
+/* maps */
+.mapshell{position:relative;height:clamp(320px,54dvh,720px);border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#071522;margin:12px 0}
+.module-fs .mapshell{height:calc(100dvh - 400px);min-height:240px}
+#mapCanvas{width:100%;height:100%;background:#071522}
+.mapoverlay{position:absolute;z-index:500;left:10px;top:10px;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--neon);border-radius:10px;background:#041321dd;color:#bffaff;font:800 9px ui-monospace,monospace;letter-spacing:.08em;pointer-events:none}
+.pin{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--hot);border:2px solid #fff;box-shadow:0 0 12px var(--hot);display:grid;place-items:center}
+.pin span{transform:rotate(45deg);font:900 11px sans-serif;color:#fff}.pin.wp{background:var(--warn);box-shadow:0 0 12px var(--warn)}.pin.user{background:#25eaff;box-shadow:0 0 16px #25eaff;border-color:#061522}
+.guide{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(110deg,var(--panel),var(--panel2))}
+.guide-main{display:flex;gap:14px;align-items:center}.arrow{font-size:44px;line-height:1;color:var(--neon);text-shadow:0 0 16px var(--neon);width:56px;text-align:center}
+.guide small{display:block;color:var(--muted);font:800 8px ui-monospace,monospace;letter-spacing:.13em}
+.guide strong#navInstruction{display:block;margin:4px 0;font:900 clamp(13px,2vw,18px) ui-monospace,monospace}
+.guide-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.guide-stats b{display:block;margin-top:6px;color:var(--neon);font:900 clamp(12px,1.6vw,16px) ui-monospace,monospace}
+.steps{max-height:170px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:10px}
+.step{display:flex;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:12px}.step:last-child{border:0}.step b{min-width:58px;color:var(--neon);font:800 10px ui-monospace,monospace}
+.step.cur{background:color-mix(in srgb,var(--neon) 16%,transparent)}.empty{padding:14px;color:var(--muted);font-size:12px;text-align:center}
+.wplist{display:flex;gap:6px;flex-wrap:wrap}.wpchip{display:flex;gap:6px;align-items:center;border:1px solid var(--warn);color:var(--warn);border-radius:99px;padding:4px 6px 4px 10px;font-size:11px}.wpchip button{padding:2px 7px;border-radius:99px;font-size:11px}
+.hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:#020b16;color:#7ea9c0;font:9px ui-monospace,monospace;letter-spacing:.09em;margin-top:10px}
+.hud b{color:var(--acid);margin-left:5px}
+.leaflet-container{font:12px ui-monospace,monospace;background:#071522}
+/* speed */
+.speedcard{overflow:hidden}
+.speedcard.over{border-color:var(--red);animation:alarm .5s infinite alternate}
+@keyframes alarm{to{box-shadow:0 0 36px var(--red),inset 0 0 36px #ff4d6a33}}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}
+.topline h2{margin:4px 0 0}.mode{font:800 9px ui-monospace,monospace;color:var(--acid);border:1px solid var(--acid);border-radius:20px;padding:7px 10px;white-space:nowrap}
+.shift{display:flex;gap:5px;justify-content:center;margin:2px 0 6px}
+.shift i{flex:1;max-width:34px;height:9px;border-radius:5px;background:color-mix(in srgb,var(--line) 70%,transparent);transition:background .12s,box-shadow .12s}
+.shift i.on{background:var(--acid);box-shadow:0 0 10px var(--acid)}.shift i.on.m{background:var(--warn);box-shadow:0 0 10px var(--warn)}.shift i.on.r{background:var(--red);box-shadow:0 0 12px var(--red)}
+.over .shift i.on{animation:blink .25s infinite alternate}@keyframes blink{to{opacity:.25}}
+.dash{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(10px,3vw,34px);align-items:center}
+.gaugewrap{position:relative;width:min(100%,520px);aspect-ratio:360/300;margin:auto;container-type:inline-size}
+[data-fx=full] .gaugewrap svg{filter:drop-shadow(0 0 16px color-mix(in srgb,var(--neon) 30%,transparent))}
+.gaugewrap svg{display:block;width:100%;height:100%;overflow:visible}
+.g-bezel{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:3 7;opacity:.8}
+[data-fx=full] .g-bezel{animation:spin 40s linear infinite;transform-origin:180px 160px}@keyframes spin{to{transform:rotate(360deg)}}
+.g-track{fill:none;stroke:color-mix(in srgb,var(--line) 60%,transparent);stroke-width:12;stroke-linecap:round}
+.g-red{fill:none;stroke:var(--red);stroke-width:4;stroke-linecap:round;opacity:.8}
+.g-prog{fill:none;stroke:url(#arcGrad);stroke-width:12;stroke-linecap:round}
+.g-tick{stroke:var(--muted);stroke-width:1.6;stroke-linecap:round}.g-tick.maj{stroke:var(--text);stroke-width:3}
+.g-lab{fill:var(--muted);font:9px ui-monospace,monospace;text-anchor:middle}
+.g-needle{fill:var(--text);stroke:var(--neon);stroke-width:1.2;filter:url(#glow)}
+.g-hub{fill:var(--bg2);stroke:var(--neon);stroke-width:3}
+.digital{position:absolute;left:0;right:0;top:61%;text-align:center;pointer-events:none}
+.num{font:900 clamp(44px,12vw,84px)/.95 ui-monospace,monospace;font:900 19cqw/.95 ui-monospace,monospace;letter-spacing:-.08em;font-variant-numeric:tabular-nums;color:var(--text);text-shadow:0 0 14px color-mix(in srgb,var(--neon) 60%,transparent),0 0 36px color-mix(in srgb,var(--neon) 35%,transparent)}
+[data-racing=on] .num{font-style:italic}
+.unit{margin-top:4px;color:var(--neon);font:900 11px ui-monospace,monospace;letter-spacing:.32em}
+.cap{margin-top:6px;color:var(--muted);font:800 8px ui-monospace,monospace;letter-spacing:.08em}
+.side{display:flex;flex-direction:column;gap:10px}
+.state{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(100deg,var(--panel),var(--panel2))}
+.state small{display:block;color:var(--muted);font:800 8px ui-monospace,monospace;letter-spacing:.14em}.state strong{font:900 12px ui-monospace,monospace}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+.controls button{min-width:104px;font:900 10px ui-monospace,monospace;letter-spacing:.06em}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(100deg,var(--panel),var(--panel2))}
+.strip b{display:block;margin-top:6px;color:var(--neon);font:900 clamp(13px,2vw,19px) ui-monospace,monospace}
+canvas.chart{display:block;width:100%;height:clamp(130px,22dvh,220px);border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--bg2) 80%,transparent);margin-top:12px}
+.alertrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:12px;margin-top:12px}
+.alertrow label{font:800 9px ui-monospace,monospace;letter-spacing:.08em;color:var(--muted)}.alertrow input{width:80px;padding:8px}.alertrow span{font:800 9px ui-monospace,monospace;color:var(--acid)}
+#hudBox{position:fixed;inset:0;z-index:1400;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+#hudBox .hbody{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+#hudBox.mir .hbody{transform:scaleX(-1)}
+#hudSpeed{font:900 min(46vw,62vh)/.9 ui-monospace,monospace;letter-spacing:-.07em;color:var(--neon);text-shadow:0 0 30px var(--neon)}
+#hudBox.over #hudSpeed{color:var(--red);text-shadow:0 0 40px var(--red);animation:blink .3s infinite alternate}
+#hudUnit{font:900 clamp(16px,4vw,30px) ui-monospace,monospace;letter-spacing:.4em;color:#9fb}
+#hudInfo{font:700 clamp(12px,2.5vw,20px) ui-monospace,monospace;color:#9bb}
+#hudBox .shift{width:90%;max-width:700px}
+#hudBox .hbtn{position:absolute;top:calc(10px + env(safe-area-inset-top));display:flex;gap:8px;right:10px}
+/* display / misc */
+.orient button.active{background:linear-gradient(135deg,var(--neon),var(--violet));color:#02121c;border:0}
+.preview{border:1px dashed var(--neon);border-radius:14px;min-height:80px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;background:color-mix(in srgb,var(--bg2) 80%,transparent);transition:all .3s;margin:16px 0}
+.preview.portrait{min-height:150px;max-width:200px;margin-inline:auto}.preview.landscape{min-height:70px}
+video.vid,iframe.yt{width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:12px;background:#030b13;max-height:62dvh}
+.partners{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.pi{width:56px;height:56px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(135deg,var(--neon),var(--violet));font-weight:900;font-size:19px;color:#02121c;box-shadow:0 0 22px color-mix(in srgb,var(--neon) 40%,transparent)}
+.partners h2{margin:16px 0 8px;font-size:19px}.partners p{color:var(--muted);line-height:1.6}
+.lnk{display:inline-flex;margin:10px 8px 0 0;padding:10px 14px;background:linear-gradient(135deg,var(--neon),var(--violet));color:#02121c;text-decoration:none;border-radius:10px;font-size:12px;font-weight:800}
+.lnk.sec{background:transparent;border:1px solid var(--line);color:var(--text)}
+.notice{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--panel2) 90%,transparent);color:var(--muted);font-size:12px;line-height:1.7}
+.diag{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:14px}
+.diag div{display:flex;gap:9px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:11px;font-size:12px}.diag small{display:block;color:var(--muted)}
+.hist{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg2) 80%,transparent)}
+.hist h3{font-size:12px;letter-spacing:.12em;color:var(--neon);margin:0 0 8px}
+.hi{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.hi:last-child{border:0}.hi strong{color:var(--acid)}.hi small{display:block;color:var(--muted);margin-top:3px}.hi button{padding:5px 9px;font-size:11px}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--bg2) 70%,transparent)}
+.sw span small{display:block;color:var(--muted);font-weight:400;font-size:11px;margin-top:2px}.sw select,.sw input[type=number]{width:130px;padding:8px}
+.sw input[type=checkbox]{appearance:none;-webkit-appearance:none;width:48px;height:27px;border-radius:99px;background:#2b4b60;position:relative;flex:none;border:0;padding:0;cursor:pointer;transition:.2s}
+.sw input[type=checkbox]:after{content:"";position:absolute;left:3px;top:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.sw input[type=checkbox]:checked{background:var(--neon)}.sw input[type=checkbox]:checked:after{left:24px}
+.setgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+/* whatsapp */
+.wabar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid #25d36677;border-radius:14px;background:linear-gradient(110deg,#06251e,#071b2b 58%,#130d2c);color:#dffff0;margin-bottom:10px}
+.wabar strong{font:900 12px ui-monospace,monospace;letter-spacing:.08em}.wabar small{display:block;color:#78cba4;font:700 8px ui-monospace,monospace}
+.waframe{position:relative;height:clamp(420px,64dvh,860px);border:1px solid #25d36677;border-radius:14px;overflow:hidden;background:#0b141a;margin-top:10px}
+.waframe iframe{width:100%;height:100%;border:0;display:block}
+.waov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:radial-gradient(ellipse,#12392c,#030910);color:#dffff0;pointer-events:none;transition:opacity .35s}
+.waov.hidden{opacity:0;visibility:hidden}.waov span,.waov small{color:#9bc5b2;font-size:12px;max-width:430px}
+.loader{width:34px;height:34px;border:3px solid #25d36633;border-top-color:#25d366;border-radius:50%;animation:spinL .8s linear infinite}@keyframes spinL{to{transform:rotate(360deg)}}
+.doctor{margin-top:14px}.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.dm{padding:10px;border:1px solid var(--line);border-radius:11px}.dm small{display:block;color:var(--muted);font:800 8px ui-monospace,monospace;letter-spacing:.12em}.dm strong{display:block;margin:5px 0 2px;color:var(--acid);font:900 12px ui-monospace,monospace}.dm span{display:block;color:var(--muted);font-size:10px}
+.dchat{border:1px solid var(--line);border-radius:13px;overflow:hidden}.dmsgs{height:230px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+.dmsg{max-width:min(92%,620px);padding:9px 12px;border-radius:11px;font-size:12px;overflow-wrap:anywhere}.dmsg.bot{align-self:flex-start;background:color-mix(in srgb,var(--acid) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--acid) 35%,transparent)}.dmsg.user{align-self:flex-end;background:color-mix(in srgb,var(--neon) 14%,var(--panel));border:1px solid color-mix(in srgb,var(--neon) 40%,transparent)}
+.dmsg b{display:block;color:var(--acid);font:900 8px ui-monospace,monospace;letter-spacing:.1em;margin-bottom:3px}.dmsg p{margin:0}.dmsg time{display:block;margin-top:4px;color:var(--muted);font:700 8px ui-monospace,monospace}
+.dquick{display:flex;gap:6px;flex-wrap:wrap;padding:9px;border-top:1px solid var(--line)}.dquick button{border-radius:20px;padding:6px 10px;font-size:10px}
+.dcomp{display:flex;gap:7px;padding:10px;border-top:1px solid var(--line)}.dcomp input{flex:1}
+.dlog{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#030b13;color:#7ca9a6;font:9px/1.6 ui-monospace,monospace;white-space:pre-wrap;max-height:100px;overflow:auto}
+/* toasts */
+#toasts{position:fixed;z-index:2000;left:50%;transform:translateX(-50%);top:calc(var(--hdr) + 8px);display:flex;flex-direction:column;gap:8px;width:min(92vw,440px);pointer-events:none}
+.toast{padding:11px 14px;border-radius:12px;border:1px solid var(--neon);background:color-mix(in srgb,var(--bg2) 94%,transparent);box-shadow:0 8px 30px #0008;font-size:13px;animation:tin .25s ease;color:var(--text)}
+.toast.warn{border-color:var(--warn)}.toast.err{border-color:var(--red)}.toast.out{opacity:0;transition:opacity .3s}@keyframes tin{from{opacity:0;transform:translateY(-10px)}}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:22px}
+/* fx levels */
+[data-fx=lite] .ph:after,[data-fx=lite] .g-bezel,[data-fx=lite] .card:before,[data-fx=lite] .tile:before{display:none;animation:none}
+[data-fx=off] *,[data-fx=off] *:before,[data-fx=off] *:after{animation:none!important;transition:none!important;backdrop-filter:none!important}
+[data-fx=off] #galaxy,[data-fx=off] body:after{display:none}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+@media(max-width:1000px){.hero3{grid-template-columns:1fr 1fr}.dash{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.guide{grid-template-columns:1fr}.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px) and (orientation:portrait){
+ :root{--rail:0px;--hdr:58px;--bottom:calc(60px + env(safe-area-inset-bottom))}
+ .nav{top:auto;width:auto;right:0;height:var(--bottom);flex-direction:row;border-right:0;border-top:1px solid var(--line);overflow-x:auto;overflow-y:hidden;padding:5px 6px env(safe-area-inset-bottom)}
+ .nav-brand,.nav-foot{display:none}.nav button{width:auto;min-width:56px;min-height:0}
+ header{padding-left:12px}.hright .pill{display:none}.brand{font-size:13px}.logo{width:32px;height:32px}.clock strong{font-size:15px}
+ main{padding:10px 10px 24px}.hero3{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.guide-stats{grid-template-columns:repeat(3,1fr)}.mapshell{height:46dvh}
+ .hi{grid-template-columns:1fr auto}.hi button{grid-column:1/-1}.waframe{height:calc(100dvh - 330px);min-height:340px}.sw select,.sw input[type=number]{width:105px}
+}
+@media(orientation:landscape) and (max-height:560px){
+ :root{--hdr:50px}.nav button{min-height:46px}.nav-brand{height:34px;min-height:34px}.ph{padding:10px 14px;margin-bottom:10px}.ph h1{font-size:20px;margin:2px 0}.ph p{display:none}
+ .dash{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gaugewrap{width:min(100%,330px)}.mapshell{height:62dvh}.waframe{height:calc(100dvh - 190px)}
+}
+ 
+#locationIntel .metric strong{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+#locationIntel .hist{margin-top:10px}
+#locationIntel .topline{margin-bottom:10px}
+#mapSuggestions{position:absolute;z-index:1200;left:0;right:90px;top:100%;background:var(--panel);border:1px solid var(--neon);border-radius:12px;box-shadow:0 12px 28px #0009;max-height:240px;overflow:auto}
+#mapSuggestions button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;padding:10px;font-size:12px}
+#mapSuggestions button:last-child{border:0}
+#navigation .stack>.row:first-child{position:relative}
+.loc-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--line);font-size:12px}
+.loc-item:last-child{border:0}.loc-item button{padding:5px 8px}
+</style>
+
+<style id="navixu3-gps-only-upgrade">
+#page-maps .mapshell{position:relative}
+#gpsOnlyHud{display:none}
+body.gps-only-mode{overflow:hidden!important}
+body.gps-only-mode #page-maps{display:block!important;position:fixed!important;inset:0!important;z-index:99990!important;background:#020711!important;padding:0!important;margin:0!important;overflow:hidden!important}
+body.gps-only-mode #page-maps>*:not(#navigation){display:none!important}
+body.gps-only-mode #navigation{display:block!important;position:static!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+body.gps-only-mode #navigation>*:not(.mapshell){display:none!important}
+body.gps-only-mode #page-maps .mapshell{display:block!important;position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;border:0!important;border-radius:0!important;z-index:99991!important}
+body.gps-only-mode #mapCanvas{width:100%!important;height:100%!important}
+body.gps-only-mode #gpsOnlyHud{display:flex;position:absolute;z-index:1200;left:12px;right:12px;bottom:max(14px,env(safe-area-inset-bottom));align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid #20eaff88;border-radius:15px;background:#03101deF;color:#e9fbff;backdrop-filter:blur(14px);box-shadow:0 0 24px #00d9ff33;font:700 11px ui-monospace,monospace}
+#gpsOnlyHud .gps-hud-data{display:flex;flex-direction:column;gap:3px;min-width:0}
+#gpsOnlyHud strong{font-size:17px;color:#42f5ff}
+#gpsOnlyHud small{font-size:9px;color:#9ab9c8}
+#gpsOnlyHud button{padding:9px 11px;white-space:nowrap}
+body.gps-only-mode .mapoverlay{top:12px;left:12px}
+#gpsOnlyToggle{position:absolute;z-index:1201;right:12px;top:12px}
+#gpsOnlyHud .gps-accuracy{color:#b9eaff}
+@media(max-width:520px){#gpsOnlyHud{left:8px;right:8px;padding:8px;gap:5px}#gpsOnlyHud strong{font-size:14px}#gpsOnlyHud button{font-size:9px;padding:8px}}
+</style>
+<style id="navixu3-speedometer-themes">
+/* Tema speedometer terpisah: tidak mengubah palet menu lain. */
+#speedCard[data-gauge-theme="cyber"]{--neon:#2fe9ff;--violet:#b36bff;--acid:#5cffb1;--line:#17506f;--panel:#0a1b2e;--panel2:#0d2540}
+#speedCard[data-gauge-theme="ocean"]{--neon:#35c9ff;--violet:#2878ff;--acid:#70f5dc;--line:#155b83;--panel:#06243b;--panel2:#0a3555}
+#speedCard[data-gauge-theme="racing"]{--neon:#ff493d;--violet:#ff9d22;--acid:#ffe45c;--line:#71302e;--panel:#260d12;--panel2:#40151b}
+#speedCard[data-gauge-theme="matrix"]{--neon:#39ff72;--violet:#00c878;--acid:#b5ff39;--line:#17633a;--panel:#061b10;--panel2:#0b2b18}
+#speedCard[data-gauge-theme="violet"]{--neon:#c58bff;--violet:#743cff;--acid:#ff75db;--line:#58377c;--panel:#1b1030;--panel2:#291647}
+#speedCard[data-gauge-theme="sunset"]{--neon:#ff9b45;--violet:#ff4d76;--acid:#ffe078;--line:#79402c;--panel:#28140d;--panel2:#432014}
+#speedCard[data-gauge-theme="ice"]{--neon:#b7f4ff;--violet:#58b9ff;--acid:#d8fff7;--line:#477d91;--panel:#102630;--panel2:#183b4a}
+#speedCard[data-gauge-theme="classic"]{--neon:#f5d36b;--violet:#d68b36;--acid:#9fe3a2;--line:#66502d;--panel:#211d13;--panel2:#39301c}
+#speedCard[data-gauge-theme="stealth"]{--neon:#c2d0dc;--violet:#71869b;--acid:#a5c5b2;--line:#344553;--panel:#101820;--panel2:#1b2833}
+#speedCard .speed-theme-control select{max-width:100%}
+@media(max-width:520px){#speedCard .speed-theme-control{justify-content:space-between!important}#speedCard .speed-theme-control select{flex:1;min-width:0!important;max-width:62%}}
+</style>
+
+
+<style id="navixu3-v4-style">
+.v4-weather{margin:14px 0;border-color:color-mix(in srgb,var(--neon) 65%,var(--line));box-shadow:0 0 24px color-mix(in srgb,var(--neon) 10%,transparent)}
+.v4-weather .metric strong{font-size:clamp(15px,2vw,21px)}
+.wx-alert{margin-top:10px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--panel2) 82%,transparent);font-weight:800}.wx-alert.warn{border-color:var(--warn);color:var(--warn)}.wx-alert.danger{border-color:var(--red);color:var(--red)}
+.wx-map-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.wx-map-controls small{color:var(--muted)}.wx-map-controls button.on{border-color:var(--acid);color:var(--acid)}.wx-map-status{font-size:11px;color:var(--muted);margin:6px 0 12px}
+#v4WeatherState{white-space:nowrap}#v4AssistText{line-height:1.65}
+@media(max-width:620px){.v4-weather .grid.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.v4-weather .row button{flex:1}}
+</style>
+
+<style id="r3pro-phone-link-style">
+.phone-hero{border-color:color-mix(in srgb,var(--neon) 60%,var(--line));box-shadow:0 0 24px color-mix(in srgb,var(--neon) 9%,transparent)}
+#rpEventList .notice{margin:8px 0}
+#rpEventList .rp-event{padding:10px 12px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+#rpEventList .rp-event strong{display:block;color:var(--neon)}
+#rpEventList .rp-event small{color:var(--muted)}
+#rpBrowserPermission{min-height:1.4em}
+@media(max-width:620px){#page-phonelink .grid.g3{grid-template-columns:repeat(3,minmax(0,1fr))}#page-phonelink .row button{flex:1}}
+</style>
+
+</head>
+<body>
+<canvas id="galaxy" aria-hidden="true"></canvas>
+<header>
+ <div class="brand"><div class="logo">⌁</div><div>R3PRO</div></div>
+ <div class="hright"><div class="pill"><span class="dot" id="gpsDot"></span><span id="gpsHeader">GPS belum aktif</span></div><div class="clock"><strong id="clock">--:--:--</strong><small id="date">Memuat tanggal…</small></div></div>
+</header>
+<nav class="nav" aria-label="Navigasi modul">
+ <div class="nav-brand">R3P</div>
+ <button data-go="home" class="selected"><b>⌂</b><small>HOME</small></button>
+ <button data-go="maps"><b>⌖</b><small>MAPS</small></button>
+ <button data-go="speed"><b>◉</b><small>SPEED</small></button>
+ <button data-go="trip"><b>◷</b><small>TRIP</small></button>
+ <button data-go="orientation"><b>▣</b><small>DISPLAY</small></button>
+ <button data-go="mirror"><b>▤</b><small>MIRROR</small></button>
+ <button data-go="music"><b>♫</b><small>MUSIC</small></button>
+ <button data-go="apps"><b>◈</b><small>SHOPEE</small></button>
+ <button data-go="connections"><b>⌁</b><small>DEVICE</small></button>
+ <button data-go="phonelink"><b>⇄</b><small>PHONE LINK</small></button>
+ <button data-go="whatsapp"><b>✆</b><small>WA WEB</small></button>
+ <button data-go="settings"><b>⚙</b><small>SETUP</small></button>
+ <div class="nav-foot">SYS<br>ONLINE</div>
+</nav>
+<button class="fs-exit" id="fsExit" type="button" aria-label="Keluar dari fullscreen" title="Keluar dari fullscreen">✕</button>
+<div id="toasts" aria-live="polite"></div>
+
+<div id="hudBox" hidden>
+ <div class="hbtn"><button id="hudMirror" type="button">⇋ CERMIN</button><button id="hudClose" type="button">✕ TUTUP</button></div>
+ <div class="hbody"><div class="shift" id="hudBars"></div><div id="hudSpeed">0</div><div id="hudUnit">KM/H</div><div id="hudInfo">--</div></div>
+</div>
+
+<main id="main">
+ <!-- HOME -->
+ <section class="page active" id="page-home" data-page="home">
+  <div class="ph"><div><span class="eyebrow">SYSTEM OVERVIEW / 01</span><h1>COMMAND CENTER</h1><p>Pusat kendali perjalanan naviXU3 · data langsung dari sensor perangkat.</p></div><div class="ph-tools"><span class="tag"><i></i>SYSTEM ONLINE</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button><button class="fsbtn" data-fs="app" type="button">▣ APLIKASI</button></div></div>
+  <div class="pills">
+   <div class="pill"><span class="dot" id="gpsDot2"></span><span id="gpsStatus">GPS: nonaktif</span></div>
+   <div class="pill"><span class="dot" id="mirrorDot"></span><span id="mirrorStatus">Screen share: berhenti</span></div>
+   <div class="pill"><span class="dot" id="netDot"></span><span id="netStatus">Jaringan: memeriksa</span></div>
+   <div class="pill"><span class="dot" id="batDot"></span><span id="batteryStatus">Baterai: tidak tersedia</span></div>
+  </div>
+  <div class="hero3">
+   <div class="card big metric"><small>KECEPATAN SAAT INI</small><strong id="homeSpeed">---</strong><small id="homeUnit">KM/H</small></div>
+   <div class="card metric"><small>JARAK TRIP</small><strong id="homeDist">0.00 km</strong></div>
+   <div class="card metric"><small>TOP SPEED</small><strong id="homeTop">--</strong></div>
+   <div class="card metric"><small>DURASI</small><strong id="homeTime">00:00</strong></div>
+  </div>
+  <div class="controls" style="justify-content:flex-start"><button class="primary" id="homeStart" type="button">▶ START GPS</button><button id="homeStop" type="button">■ STOP GPS</button><button data-go="speed" type="button">◉ BUKA SPEEDOMETER</button></div>
+  <section class="card v4-weather" id="v4WeatherCard" aria-live="polite">
+   <div class="topline"><div><span class="eyebrow">LIVE ENVIRONMENT / V4</span><h2>◉ WEATHER INTELLIGENCE</h2></div><span class="mode" id="v4WeatherState">MENUNGGU GPS</span></div>
+   <div class="grid g3">
+    <div class="metric"><small>SUHU UDARA</small><strong id="v4Temp">-- °C</strong></div>
+    <div class="metric"><small>TERASA SEPERTI</small><strong id="v4Feels">-- °C</strong></div>
+    <div class="metric"><small>KONDISI</small><strong id="v4WeatherText">Menunggu lokasi</strong></div>
+    <div class="metric"><small>KELEMBAPAN</small><strong id="v4Humidity">--%</strong></div>
+    <div class="metric"><small>ANGIN</small><strong id="v4Wind">-- km/j</strong></div>
+    <div class="metric"><small>CURAH HUJAN</small><strong id="v4Rain">-- mm</strong></div>
+    <div class="metric"><small>CAKUPAN AWAN</small><strong id="v4Cloud">--%</strong></div>
+    <div class="metric"><small>POTENSI HUJAN</small><strong id="v4RainChance">--%</strong></div>
+    <div class="metric"><small>POTENSI PETIR</small><strong id="v4Thunder">--%</strong></div>
+   </div>
+   <div class="wx-alert" id="v4WeatherAlert" role="status">Menunggu data cuaca untuk peringatan.</div>
+   <div class="row" style="margin-top:10px;align-items:center"><small class="muted" id="v4WeatherUpdated">Data cuaca memerlukan GPS dan internet.</small><button id="v4WeatherRefresh" type="button">↻ PERBARUI CUACA</button><button id="v4Install" class="primary" type="button" hidden>＋ PASANG APLIKASI</button></div>
+   <p class="note">Cuaca dari Open-Meteo berdasarkan koordinat GPS perangkat. Pembaruan berkala, bukan sensor cuaca di kendaraan. Potensi petir berasal dari model per jam, bukan deteksi sambaran petir langsung. Koordinat dikirim ke layanan tersebut saat meminta data. <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather data by Open-Meteo.com</a>.</p>
+  </section>
+  <section class="card" id="v4Assistant" style="margin-top:12px">
+   <div class="topline"><div><span class="eyebrow">LOCAL NAVIGATION SUPPORT</span><h2>✦ NAVIXU3 DRIVE ASSIST</h2></div><span class="mode">LOKAL</span></div>
+   <p id="v4AssistText" class="note">Asisten lokal siap. Aktifkan GPS atau buat rute untuk mendapatkan ringkasan perjalanan.</p>
+   <div class="row"><button id="v4AssistRefresh" type="button">ANALISIS PERJALANAN</button><button id="v4ShareTrip" type="button">↗ BAGIKAN POSISI</button></div>
+  </section>
+  <div class="tiles">
+   <button class="tile tilt" data-go="maps"><b>⌖</b><strong>SMART MAPS</strong><small>Rute, belokan, rute ulang otomatis</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="speed"><b>◉</b><strong>RACE SPEEDOMETER</strong><small>Jarum realtime · grafik · alarm</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="trip"><b>◷</b><strong>TRIP DATA</strong><small>Riwayat, statistik, ekspor CSV</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="orientation"><b>▣</b><strong>DISPLAY CONTROL</strong><small>Portrait / Landscape / layar menyala</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="mirror"><b>▤</b><strong>SCREEN MIRROR</strong><small>Capture layar lokal</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="music"><b>♫</b><strong>DRIVE MUSIC</strong><small>YouTube &amp; playlist</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="apps"><b>◈</b><strong>SHOPEE CONNECT</strong><small>ShopeeFood / Shopee Driver</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="connections"><b>⌁</b><strong>DEVICE LINK</strong><small>Diagnostik, jaringan, Bluetooth</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="whatsapp"><b>✆</b><strong>WHATSAPP WEB</strong><small>Panel &amp; diagnosa koneksi</small><span>OPEN MODULE ↗</span></button>
+   <button class="tile tilt" data-go="settings"><b>⚙</b><strong>SETTINGS</strong><small>Tema, efek, racing, alarm</small><span>OPEN MODULE ↗</span></button>
+  </div>
+  <div class="term"><div class="term-head">ROOT@NAVIXU3:~ <span>LIVE EVENT LOG</span></div><div id="sysLog"><p>[BOOT] naviXU3 PRO MAX dimuat.</p></div></div>
+ </section>
+
+ <!-- MAPS -->
+ <section class="page" id="page-maps" data-page="maps">
+  <div class="ph"><div><span class="eyebrow">NAVIGATION MODULE / 02</span><h1>SMART MAPS</h1><p>Peta, rute, titik singgah, panduan belokan &amp; suara.</p></div><div class="ph-tools"><span class="tag">GPS LINK</span><button class="fsbtn" data-fs="page" type="button">⛶ FULLSCREEN</button></div></div>
+  <section class="card" id="navigation">
+   <div class="stack">
+    <div class="row"><input id="destination" placeholder="Cari tempat, nama jalan, nomor rumah, RT/RW, dusun, desa, kecamatan, atau koordinat GPS…" autocomplete="off"><button class="primary" id="searchMap" type="button">⌕ CARI RUTE</button></div>
+    <div class="row"><input id="waypoint" placeholder="Titik singgah (opsional, bisa lebih dari satu)" autocomplete="off"><button id="addWaypoint" type="button">+ SINGGAH</button></div>
+    <div class="wplist" id="wpList"></div>
+   </div>
+   <div class="mapshell"><div id="mapCanvas" role="application" aria-label="Peta navigasi interaktif"></div><div class="mapoverlay"><span class="dot ok"></span><b>naviXU3 LIVE MAP</b><span id="navMapNetwork">MAP ENGINE READY</span></div><button id="gpsOnlyToggle" type="button">⛶ GPS FULLSCREEN</button><div id="gpsOnlyHud"><div class="gps-hud-data"><small>GPS POSITION · LIVE</small><strong id="gpsOnlySpeed">-- km/j</strong><span class="gps-accuracy" id="gpsOnlyAccuracy">Menunggu GPS…</span></div><div class="gps-hud-data"><small>KOORDINAT</small><span id="gpsOnlyCoords">--</span><span id="gpsOnlyAddress">Alamat menunggu data</span></div><button id="gpsOnlyCenter" type="button">⌖ LOKASI</button><button id="gpsOnlyExit" type="button">KELUAR</button></div></div>
+   <div class="wx-map-controls"><b>LIVE WEATHER MAP</b><button id="wxRadarToggle" type="button">🌧 RADAR HUJAN: OFF</button><button id="wxRadarRefresh" type="button">↻ UPDATE RADAR</button><small id="wxRadarStatus">Radar menunggu peta dan internet.</small></div>
+   <div class="row" style="margin-bottom:12px"><button id="myLocation" type="button">⌖ LOKASI SAYA</button><button class="primary" id="openMaps" type="button">▶ MULAI NAVIGASI</button><button class="danger" id="stopNavigation" type="button">■ SELESAI</button><button id="followBtn" type="button">◎ IKUTI</button><button id="tileBtn" type="button">▦ PETA</button><button id="voiceBtn" type="button">🔊 SUARA</button></div>
+ 
+   <section class="card" id="locationIntel" style="margin:12px 0">
+    <div class="topline"><div><span class="eyebrow">LOCATION INTELLIGENCE / LIVE</span><h2>⌖ INFORMASI LOKASI GPS</h2></div><span class="mode" id="locSignal">MENUNGGU GPS</span></div>
+    <div class="grid g3">
+     <div class="metric"><small>LATITUDE</small><strong id="locLat">--</strong></div>
+     <div class="metric"><small>LONGITUDE</small><strong id="locLon">--</strong></div>
+     <div class="metric"><small>AKURASI GPS</small><strong id="locAcc">--</strong></div>
+    </div>
+    <div class="grid g3" style="margin-top:9px">
+     <div class="metric"><small>ARAH KOMPAS</small><strong id="locHeading">--</strong></div>
+     <div class="metric"><small>SUMBER LOKASI</small><strong id="locSource">MENUNGGU</strong></div>
+     <div class="metric"><small>PEMBARUAN</small><strong id="locUpdated">--</strong></div>
+    </div>
+    <div class="hist">
+     <h3>▤ ALAMAT ADMINISTRATIF</h3>
+     <div class="grid g2">
+      <div class="metric"><small>NAMA TEMPAT / JALAN</small><strong id="addrRoad">Data tidak tersedia</strong></div>
+      <div class="metric"><small>DUSUN / LINGKUNGAN</small><strong id="addrHamlet">Data tidak tersedia</strong></div>
+      <div class="metric"><small>RT / RW</small><strong id="addrRtRw">Tidak disediakan data peta</strong></div>
+      <div class="metric"><small>DESA / KELURAHAN</small><strong id="addrVillage">Data tidak tersedia</strong></div>
+      <div class="metric"><small>KECAMATAN</small><strong id="addrDistrict">Data tidak tersedia</strong></div>
+      <div class="metric"><small>KABUPATEN / KOTA</small><strong id="addrCounty">Data tidak tersedia</strong></div>
+      <div class="metric"><small>PROVINSI</small><strong id="addrProvince">Data tidak tersedia</strong></div>
+      <div class="metric"><small>KODE POS</small><strong id="addrPostcode">Data tidak tersedia</strong></div>
+      <div class="metric"><small>NEGARA</small><strong id="addrCountry">Data tidak tersedia</strong></div>
+     </div>
+     <p class="note" id="addrFull">Alamat lengkap akan muncul setelah GPS mendapatkan posisi.</p>
+     <div class="row"><button id="copyLocation" type="button">▣ SALIN KOORDINAT</button><button id="copyAddress" type="button">▣ SALIN ALAMAT</button><button id="shareLocation" type="button">↗ BAGIKAN</button><button id="saveFavorite" type="button">☆ SIMPAN FAVORIT</button></div>
+    </div>
+    <div class="hist"><h3>☆ LOKASI FAVORIT</h3><div id="favoriteLocations" class="empty">Belum ada lokasi favorit.</div></div>
+    <div class="hist"><h3>◷ RIWAYAT PENCARIAN</h3><div id="locationHistory" class="empty">Belum ada pencarian.</div></div>
+   </section>
+   <div class="row" style="margin:8px 0"><label class="muted" for="mapLayerSelect">MAP LAYER</label><select id="mapLayerSelect"><option value="osm">Standar</option><option value="satellite">Satelit</option><option value="terrain">Terrain</option><option value="dark">Gelap</option></select><button id="mapCompass" type="button">◎ KOMPAS PETA</button></div>
+   <div class="guide"><div class="guide-main"><div class="arrow" id="navArrow">⌖</div><div><small>NEXT MANEUVER</small><strong id="navInstruction">Masukkan tujuan untuk membuat rute</strong><span class="muted" id="navDistanceNext" style="font-size:11px">Menunggu rute</span></div></div><div class="guide-stats"><div class="metric"><small>SISA JARAK</small><strong id="navRemaining">--</strong></div><div class="metric"><small>ESTIMASI</small><strong id="navEta">--</strong></div><div class="metric"><small>KECEPATAN</small><strong id="navLiveSpeed">--</strong></div></div></div>
+   <div class="hud" id="roadConditionPanel" style="margin-top:8px;flex-wrap:wrap">
+    <span>PEMERIKSAAN JALAN<b id="roadConditionStatus">MENUNGGU RUTE</b></span>
+    <span>PERMUKAAN<b id="roadSurfaceStatus">BELUM DIPERIKSA</b></span>
+    <span>DATA<b id="roadDataTime">TIDAK TERSEDIA · BUKAN LIVE TRAFFIC</b></span>
+   </div>
+   <div class="steps" id="navStepList"><div class="empty">Instruksi belokan akan tampil di sini setelah rute dibuat.</div></div>
+   <div class="hud"><span>MAP ENGINE<b id="mapLinkStatus">READY</b></span><span>ROUTE<b id="mapOrientationStatus">WAITING</b></span><span>GPS FIX<b id="mapGpsFix">WAITING</b></span></div>
+   <p class="note">PENCARIAN PRESISI: masukkan nama jalan + nomor rumah, RT/RW, dusun, desa/kelurahan, kecamatan, atau tempel koordinat latitude,longitude. Hasil alamat mengikuti ketersediaan data peta; titik GPS tetap ditampilkan meskipun alamat rumah/RT/RW belum terpetakan. Akurasi dalam meter adalah hasil sensor aktual, bukan jaminan 100%.</p>\n    <p class="note">Peta: OpenStreetMap/CARTO · rute: OSRM (cadangan BRouter) · pencarian: Photon/Nominatim. Perlu internet dan izin lokasi (HTTPS). Rute dihitung ulang otomatis bila Anda keluar jalur. Atur tujuan sebelum berkendara; jangan mengoperasikan layar saat kendaraan berjalan.</p>
+  </section>
+ </section>
+
+ <!-- SPEED -->
+ <section class="page" id="page-speed" data-page="speed">
+  <div class="ph"><div><span class="eyebrow">RACE TELEMETRY / 03</span><h1>RACE GPS SPEEDOMETER</h1><p>Kecepatan asli dari GPS · telemetri · performa perjalanan</p></div><div class="ph-tools"><span class="tag"><i></i><span id="raceGpsBadge">GPS STANDBY</span></span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button><button class="fsbtn" data-fs="app" type="button">▣ APLIKASI</button></div></div>
+  <section class="card speedcard" id="speedCard">
+   <div class="topline"><div><span class="eyebrow">LIVE INSTRUMENT CLUSTER</span><h2>◉ PERFORMANCE SPEEDOMETER</h2></div><div class="mode" id="modeTag">GPS SENSOR</div></div>
+   <div class="row speed-theme-control" style="justify-content:flex-end;margin:0 0 12px">
+    <label for="gaugeTheme" class="muted" style="font:800 10px ui-monospace,monospace;letter-spacing:.08em">TEMA SPEEDOMETER</label>
+    <select id="gaugeTheme" data-cfg="gaugeTheme" aria-label="Pilih tema speedometer" style="min-width:175px;padding:9px 11px">
+     <option value="cyber">Cyber Hacker</option><option value="ocean">Blue Ocean</option><option value="racing">Racing Red</option><option value="matrix">Matrix Green</option><option value="violet">Neon Violet</option><option value="sunset">Sunset Orange</option><option value="ice">Arctic Ice</option><option value="classic">Classic Sport</option><option value="stealth">Stealth Dark</option>
+    </select>
+   </div>
+   <div class="shift" id="shiftLights"></div>
+   <div class="dash">
+    <div class="gaugewrap">
+     <svg id="gauge" viewBox="0 0 360 300" role="img" aria-label="Speedometer">
+      <defs><linearGradient id="arcGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0" style="stop-color:var(--neon)"/><stop offset=".6" style="stop-color:var(--violet)"/><stop offset="1" style="stop-color:var(--acid)"/></linearGradient><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="180" cy="160" r="152" class="g-bezel"/>
+      <path id="gaugeTrack" class="g-track"/><path id="gaugeRed" class="g-red"/><path id="gaugeProgress" class="g-prog"/>
+      <g id="gaugeTicks"></g>
+      <g id="gaugeNeedle"><path class="g-needle" d="M176 160 L180 48 L184 160 L180 176 Z"/></g>
+      <circle cx="180" cy="160" r="12" class="g-hub"/><circle cx="180" cy="160" r="4" fill="var(--neon)"/>
+     </svg>
+     <div class="digital"><div class="num" id="speedValue">---</div><div class="unit" id="speedUnit">KM/H</div><div class="cap" id="speedCaption">AKTIFKAN GPS UNTUK MEMULAI</div></div>
+    </div>
+    <div class="side">
+     <div class="state"><span class="dot" id="raceStateDot"></span><div><small>SENSOR STATUS</small><strong id="raceSensorState">MENUNGGU GPS</strong></div></div>
+     <div class="grid g2">
+      <div class="metric"><small>AVG (BERGERAK)</small><strong id="avgSpeed">--</strong></div>
+      <div class="metric"><small>TOP SPEED</small><strong id="maxSpeed">--</strong></div>
+      <div class="metric"><small>AKURASI GPS</small><strong id="accuracy">--</strong></div>
+      <div class="metric"><small>KETINGGIAN</small><strong id="altitude">--</strong></div>
+      <div class="metric"><small>ARAH</small><strong id="heading">--</strong></div>
+      <div class="metric"><small>KUALITAS GPS</small><strong id="gpsQuality">WAITING</strong></div>
+     </div>
+    </div>
+   </div>
+   <div class="controls"><button class="primary" id="startGps" type="button">▶ START GPS</button><button class="danger" id="stopGps" type="button">■ STOP</button><button id="resetTrip" type="button">↺ RESET TRIP</button><button id="unitBtn" type="button">KM/H</button><button id="racingBtn" type="button">🏁 RACING</button><button id="hudBtn" type="button">◈ HUD KACA</button></div>
+   <div class="strip">
+    <div><small class="muted">JARAK TRIP</small><b id="raceDistance">0.00 km</b></div>
+    <div><small class="muted">WAKTU</small><b id="raceDuration">00:00</b></div>
+    <div><small class="muted">GPS FIX</small><b id="raceFix">NO FIX</b></div>
+    <div><small class="muted">KOORDINAT</small><b id="coordsSpeed" style="font-size:11px">--</b></div>
+   </div>
+   <canvas class="chart" id="speedChart" aria-label="Grafik kecepatan"></canvas>
+   <div class="alertrow"><label for="speedLimit">BATAS KECEPATAN (KM/H)</label><input id="speedLimit" type="number" min="5" max="200" inputmode="numeric"><button id="saveSpeedLimit" type="button">SET LIMIT</button><button id="testAlarm" type="button">UJI ALARM</button><span id="speedAlertStatus">ALERT STANDBY</span></div>
+   <p class="note">Kecepatan diambil dari sensor GPS perangkat dan disaring (akurasi &gt; 60 m diabaikan). Akurasi dipengaruhi langit terbuka dan kondisi sinyal. Gunakan dudukan aman; jangan mengoperasikan layar saat berkendara.</p>
+  </section>
+ </section>
+
+ <!-- TRIP -->
+ <section class="page" id="page-trip" data-page="trip">
+  <div class="ph"><div><span class="eyebrow">TRIP ANALYTICS / 04</span><h1>TRIP DATA</h1><p>Sesi berjalan, grafik, dan riwayat perjalanan tersimpan.</p></div><div class="ph-tools"><span class="tag">SESSION DATA</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card">
+   <h2>◷ SESI SAAT INI</h2>
+   <div class="grid g4"><div class="metric"><small>DURASI</small><strong id="duration">00:00</strong></div><div class="metric"><small>JARAK GPS</small><strong id="distance">0.00 km</strong></div><div class="metric"><small>RATA-RATA</small><strong id="tripAvg">--</strong></div><div class="metric"><small>TOP SPEED</small><strong id="tripMax">--</strong></div></div>
+   <div class="metric" style="margin-top:10px"><small>KOORDINAT</small><strong id="coords" style="font-size:12px">--</strong></div>
+   <canvas class="chart" id="tripChart" aria-label="Grafik perjalanan"></canvas>
+   <div class="row" style="margin-top:14px"><button class="primary" id="saveTrip" type="button">💾 SIMPAN PERJALANAN</button><button id="exportTrips" type="button">⇩ EKSPOR CSV</button><button class="danger" id="clearTrips" type="button">🗑 HAPUS RIWAYAT</button><button data-go="speed" type="button">◉ SPEEDOMETER</button></div>
+   <div class="hist"><h3>▤ STATISTIK TOTAL</h3><div id="tripTotals" class="muted" style="font-size:12px">Belum ada data.</div></div>
+   <div class="hist"><h3>▤ RIWAYAT PERJALANAN</h3><div id="tripHistoryList">Belum ada perjalanan tersimpan.</div></div>
+   <p class="note">Riwayat &amp; sesi berjalan disimpan di penyimpanan lokal browser perangkat ini dan dipulihkan setelah muat ulang. Sinkronisasi antarperangkat memerlukan backend.</p>
+  </section>
+ </section>
+
+ <!-- DISPLAY -->
+ <section class="page" id="page-orientation" data-page="orientation">
+  <div class="ph"><div><span class="eyebrow">DISPLAY MODULE / 05</span><h1>DISPLAY CONTROL</h1><p>Orientasi, layar penuh, dan layar tetap menyala.</p></div><div class="ph-tools"><span class="tag">REALTIME UI</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card" id="displayMode">
+   <h2>▣ KONFIGURASI LAYAR</h2>
+   <div class="row orient"><button class="active" id="autoOrientation" type="button">Otomatis</button><button id="portraitOrientation" type="button">Berdiri · Portrait</button><button id="landscapeOrientation" type="button">Miring · Landscape</button></div>
+   <div class="preview" id="orientationPreview">Mode otomatis mengikuti orientasi perangkat</div>
+   <div class="row" style="justify-content:center"><button class="primary" id="applyOrientation" type="button">Terapkan orientasi</button><button id="fullscreenBtn" type="button">Layar penuh</button><button id="wakeBtn" type="button">☀ Layar tetap menyala</button></div>
+   <div class="grid g3" style="margin-top:14px"><div class="metric"><small>VIEWPORT</small><strong id="viewInfo">--</strong></div><div class="metric"><small>ORIENTASI</small><strong id="orientInfo">--</strong></div><div class="metric"><small>WAKE LOCK</small><strong id="wakeInfo">MATI</strong></div></div>
+   <p class="note" id="orientationStatus">Penguncian orientasi bergantung dukungan browser; di Android biasanya hanya berfungsi dalam layar penuh atau APK.</p>
+  </section>
+ </section>
+
+ <!-- MIRROR -->
+ <section class="page" id="page-mirror" data-page="mirror">
+  <div class="ph"><div><span class="eyebrow">CAST MODULE / 06</span><h1>SCREEN MIRROR</h1><p>Pratinjau screen capture lokal &amp; cek kesiapan HP kedua.</p></div><div class="ph-tools"><span class="tag">LOCAL CAPTURE</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card" id="mirror">
+   <h2>▣ SECOND PHONE RECEIVER / DEVICE MIRROR LINK</h2>
+   <div class="grid g4"><div class="metric"><small>LINK MODE</small><strong id="receiverLinkMode">BELUM TERHUBUNG</strong></div><div class="metric"><small>BLUETOOTH API</small><strong id="receiverBluetooth">MEMERIKSA…</strong></div><div class="metric"><small>NOTIFICATION ACCESS</small><strong id="receiverNotif">TIDAK DI WEB</strong></div><div class="metric"><small>RELAY</small><strong id="receiverRelay">OFFLINE</strong></div></div>
+   <p class="muted" id="receiverState" style="font-size:12px">MENUNGGU APLIKASI PENDAMPING</p>
+   <div class="row"><button class="primary" id="checkReceiver" type="button">◈ CEK KESIAPAN LINK</button><button id="receiverFullscreen" type="button">⛶ LAYAR PENERIMA</button></div>
+   <div class="notice" id="receiverFeed" style="text-align:center">RECEIVER STANDBY — belum ada stream atau notifikasi. <span id="receiverClock">--:--:--</span></div>
+   <video class="vid" id="screenPreview" autoplay playsinline muted style="margin-top:14px"></video>
+   <div class="row" style="justify-content:center;margin-top:12px"><button class="primary" id="startShare" type="button">MULAI CAPTURE LAYAR LOKAL</button><button class="danger" id="stopShare" type="button" disabled>HENTIKAN CAPTURE</button></div>
+   <div class="notice"><b>Batasan teknis:</b> browser tidak dapat membaca notifikasi/pesan HP pertama. Relay notifikasi nyata butuh aplikasi Android pendamping (Notification Listener), koneksi terenkripsi, dan receiver di HP kedua. Remote mirroring butuh MediaProjection + WebRTC signaling + server TURN. Capture di atas hanya pratinjau lokal. Jangan teruskan OTP, PIN, atau isi chat pribadi tanpa persetujuan pemilik perangkat.</div>
+  </section>
+ </section>
+
+ <!-- MUSIC -->
+ <section class="page" id="page-music" data-page="music">
+  <div class="ph"><div><span class="eyebrow">ENTERTAINMENT / 07</span><h1>DRIVE MUSIC</h1><p>Pemutar YouTube resmi untuk perjalanan.</p></div><div class="ph-tools"><span class="tag">MEDIA CENTER</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card" id="music"><h2>♫ naviXU3 MUSIC</h2>
+   <div class="row"><input id="youtubeInput" placeholder="Tempel URL YouTube / playlist atau ID video"><button class="primary" id="loadYoutube" type="button">▶ PUTAR</button></div>
+   <iframe class="yt" id="youtubePlayer" title="YouTube player" allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="margin-top:14px"></iframe>
+   <div class="row" style="margin-top:12px"><button id="openYoutube" type="button">Buka YouTube Music ↗</button></div>
+   <p class="note">Pemutaran mengikuti ketentuan YouTube (iklan, batasan akun). Video terakhir diingat setelah muat ulang.</p></section>
+ </section>
+
+ <!-- APPS -->
+ <section class="page" id="page-apps" data-page="apps">
+  <div class="ph"><div><span class="eyebrow">PARTNER APP / 08</span><h1>SHOPEE CONNECT</h1><p>Akses cepat ShopeeFood dan Shopee Driver.</p></div><div class="ph-tools"><span class="tag">EXTERNAL LINK</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <div class="partners">
+   <section class="card"><div class="pi">SF</div><h2>SHOPEEFOOD</h2><p>Buka aplikasi Shopee (ShopeeFood ada di dalamnya) atau situs resminya.</p><a class="lnk" id="openShopeeApp" href="intent://#Intent;package=com.shopee.id;S.browser_fallback_url=https%3A%2F%2Fshopee.co.id;end">Buka app Shopee ↗</a><a class="lnk sec" href="https://shopee.co.id/" target="_blank" rel="noopener">Situs Shopee ↗</a><a class="lnk sec" href="https://play.google.com/store/search?q=ShopeeFood&c=apps" target="_blank" rel="noopener">Cari ShopeeFood ↗</a></section>
+   <section class="card"><div class="pi">SD</div><h2>SHOPEE DRIVER</h2><p>Pencarian aplikasi mitra/driver resmi di Google Play. Ketersediaan mengikuti wilayah dan akun.</p><a class="lnk" href="https://play.google.com/store/search?q=Shopee%20Driver&c=apps" target="_blank" rel="noopener">Cari Shopee Driver ↗</a><a class="lnk sec" href="https://shopee.co.id/" target="_blank" rel="noopener">Situs Shopee ↗</a></section>
+  </div>
+  <div class="notice">Halaman ini tidak memiliki API resmi Shopee untuk membaca pesanan, menerima order, atau mengubah status pengantaran. Jangan masukkan kata sandi Shopee di halaman ini. Integrasi transaksi hanya boleh memakai API/kemitraan resmi.</div>
+ </section>
+
+ <!-- DEVICE -->
+ <section class="page" id="page-connections" data-page="connections">
+  <div class="ph"><div><span class="eyebrow">CONNECTIVITY / 09</span><h1>DEVICE LINK</h1><p>Diagnostik fitur perangkat, jaringan, dan Bluetooth.</p></div><div class="ph-tools"><span class="tag">I/O CONTROL</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card"><h2>⌁ KONEKSI PERANGKAT</h2>
+   <div class="grid g3"><div class="metric"><small>JARINGAN</small><strong id="connectionType">--</strong></div><div class="metric"><small>LATENSI</small><strong id="netPing">--</strong></div><div class="metric"><small>BLUETOOTH</small><strong id="btResult">BELUM DIPAIR</strong></div></div>
+   <div class="row" style="margin-top:12px"><button class="primary" id="checkNetwork" type="button">Tes jaringan</button><button id="bluetoothBtn" type="button">Pair Bluetooth</button><button id="runDiag" type="button">↻ Diagnostik fitur</button></div>
+   <div class="diag" id="diagList"></div>
+   <p class="note">Browser tidak dapat menyalakan Wi-Fi/Bluetooth sistem. Web Bluetooth butuh browser kompatibel, HTTPS, dan layanan GATT.</p></section>
+ </section>
+
+
+ <!-- R3PRO PHONE LINK -->
+ <section class="page" id="page-phonelink" data-page="phonelink">
+  <div class="ph"><div><span class="eyebrow">CROSS-DEVICE CONNECTIVITY / 11</span><h1>R3PRO PHONE LINK</h1><p>Panel pusat untuk notifikasi dan peringatan panggilan dari perangkat Android lain.</p></div><div class="ph-tools"><span class="tag">COMPANION REQUIRED</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card phone-hero">
+   <div class="topline"><div><span class="eyebrow">DEVICE BRIDGE</span><h2>⇄ HUBUNGKAN PERANGKAT</h2></div><span class="mode" id="rpLinkState">BELUM TERHUBUNG</span></div>
+   <div class="grid g3">
+    <div class="metric"><small>STATUS LINK</small><strong id="rpLinkMetric">OFFLINE</strong></div>
+    <div class="metric"><small>PERANGKAT</small><strong id="rpDeviceMetric">0</strong></div>
+    <div class="metric"><small>NOTIFIKASI</small><strong id="rpNotifMetric">0</strong></div>
+   </div>
+   <div class="notice" style="margin-top:12px">PENTING: website/PWA tidak dapat membaca notifikasi sistem atau mendeteksi panggilan dari HP lain secara langsung. Untuk fitur jarak jauh, diperlukan aplikasi pendamping Android dengan izin Notification Access, serta server relay yang aman. Modul ini tidak berpura-pura sudah tersambung.</div>
+   <div class="row" style="margin-top:12px"><button class="primary" id="rpNotifPermission" type="button">AKTIFKAN NOTIFIKASI BROWSER</button><button id="rpTestNotif" type="button">KIRIM NOTIFIKASI TES</button></div>
+   <p class="note" id="rpBrowserPermission">Izin notifikasi browser belum diperiksa.</p>
+  </section>
+  <section class="card" id="rpPairCard" style="margin-top:12px">
+   <div class="topline"><div><span class="eyebrow">SECURE DEVICE PAIRING</span><h2>QR PAIRING / HUBUNGKAN HP</h2></div><span class="mode" id="rpPairStatus">SIAP</span></div>
+   <p class="note">Buka R3PRO pada kedua HP melalui HTTPS dan jaringan internet. Buat QR di HP pertama, lalu scan dengan kamera HP kedua. Pairing memerlukan persetujuan pada kedua perangkat.</p>
+   <div class="grid g3">
+    <div class="metric"><small>RELAY</small><strong id="rpRelayState">BELUM DIATUR</strong></div>
+    <div class="metric"><small>PAIRING</small><strong id="rpPairMetric">BELUM ADA</strong></div>
+    <div class="metric"><small>LINK</small><strong id="rpLiveMetric">OFFLINE</strong></div>
+   </div>
+   <label for="rpRelayUrl" class="note" style="display:block;margin-top:12px">Alamat server relay (WebSocket), contoh: wss://domain-kamu.example</label>
+   <input id="rpRelayUrl" type="url" placeholder="wss://server-relay-kamu" autocomplete="url" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line,#345);background:var(--panel,#101827);color:inherit">
+   <div class="row" style="margin-top:10px"><button class="primary" id="rpCreatePair" type="button">BUAT QR PAIRING</button><button id="rpConnectRelay" type="button">SAMBUNGKAN RELAY</button><button id="rpDisconnect" type="button">PUTUSKAN</button></div>
+   <div id="rpQrWrap" hidden style="margin:14px auto;padding:16px;max-width:290px;text-align:center;background:#fff;color:#111;border-radius:14px"><div id="rpQrCode" style="display:flex;justify-content:center"></div><strong style="display:block;margin-top:10px">SCAN DENGAN HP KEDUA</strong><small id="rpPairCode" style="display:block;margin-top:5px;letter-spacing:2px"></small><small style="display:block;margin-top:7px">Kode berlaku 5 menit dan hanya sekali pakai.</small></div>
+   <div id="rpJoinPrompt" class="notice" hidden style="margin-top:12px">Permintaan pairing terdeteksi. Pastikan kamu mengenali perangkat ini sebelum menyetujui.</div>
+   <div class="row" style="margin-top:10px"><button class="primary" id="rpApproveJoin" type="button" hidden>SETUJUI PAIRING</button><button id="rpCancelJoin" type="button" hidden>TOLAK</button></div>
+   <p class="note" id="rpPairHelp" aria-live="polite">Relay belum dikonfigurasi. QR pairing memerlukan server relay yang aktif.</p>
+  </section>
+  <section class="card" style="margin-top:12px">
+   <div class="topline"><div><span class="eyebrow">REMOTE PHONE EVENTS</span><h2>INBOX NOTIFIKASI</h2></div><span class="mode">LOKAL DEMO</span></div>
+   <div id="rpEventList" class="diag" aria-live="polite"><div class="notice">Belum ada notifikasi dari perangkat lain. Notifikasi remote akan muncul setelah aplikasi pendamping dan server relay tersedia.</div></div>
+   <div class="row" style="margin-top:10px"><button id="rpClearEvents" type="button">BERSIHKAN RIWAYAT</button></div>
+  </section>
+  <section class="card" style="margin-top:12px">
+   <span class="eyebrow">IMPLEMENTATION STATUS</span><h2>APA YANG DIPERLUKAN UNTUK REALTIME?</h2>
+   <div class="diag">
+    <div class="diag-item"><strong>1. Aplikasi Android R3PRO Companion</strong><small>Menggunakan NotificationListenerService dengan persetujuan eksplisit pemilik HP. Dapat meneruskan nama aplikasi, waktu, dan pratinjau yang diizinkan.</small></div>
+    <div class="diag-item"><strong>2. Secure relay server</strong><small>Mengirim event melalui koneksi terenkripsi dan autentikasi perangkat. Tidak menyimpan isi pesan secara default.</small></div>
+    <div class="diag-item"><strong>3. Pairing aman</strong><small>QR / kode sekali pakai, persetujuan di kedua perangkat, tombol putuskan koneksi, dan daftar perangkat tepercaya.</small></div>
+    <div class="diag-item"><strong>4. Kontrol privasi</strong><small>Pilih aplikasi yang boleh dibagikan, sembunyikan isi pesan, dan hentikan berbagi kapan saja.</small></div>
+   </div>
+   <p class="note">Panggilan masuk dapat ditampilkan sebagai peringatan berdasarkan notifikasi sistem yang diizinkan. Website tidak dapat menjawab panggilan seluler, membaca OTP secara diam-diam, atau melewati izin Android.</p>
+  </section>
+ </section>
+
+ <!-- WHATSAPP -->
+ <section class="page" id="page-whatsapp" data-page="whatsapp">
+  <div class="ph"><div><span class="eyebrow">COMMUNICATION / 10</span><h1>WHATSAPP WEB CENTER</h1><p>WhatsApp Web resmi dalam panel naviXU3.</p></div><div class="ph-tools"><span class="tag"><i></i>OFFICIAL SERVICE</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card">
+   <div class="wabar"><div><strong>WHATSAPP // SECURE LINK</strong><small>OFFICIAL WEB CLIENT · E2E ENCRYPTED BY WHATSAPP</small></div><span id="waStatus" style="font:800 9px ui-monospace,monospace;color:#8cf5b6">SIAP MEMUAT</span></div>
+   <div class="row"><button class="primary" id="waReload" type="button">↻ MUAT ULANG</button><button id="waOpenTab" type="button">BUKA TAB CADANGAN ↗</button></div>
+   <div class="waframe"><iframe id="whatsappFrame" title="WhatsApp Web resmi" allow="clipboard-read; clipboard-write; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe><div class="waov" id="waOverlay"><div class="loader"></div><strong>INITIALIZING WHATSAPP WEB</strong><span>Menunggu layanan resmi merespons…</span><small>Jika area tetap kosong, WhatsApp memblokir penyematan iframe oleh situs lain — gunakan tab cadangan.</small></div></div>
+   <div class="doctor card" id="waDoctor">
+    <span class="eyebrow">LIVE DIAGNOSTICS / SUPPORT</span><h2 style="margin-top:6px">WA CONNECTION DOCTOR</h2>
+    <div class="dgrid"><div class="dm"><small>INTERNET</small><strong id="waNetState">MEMERIKSA</strong><span id="waNetDetail">Status jaringan</span></div><div class="dm"><small>IFRAME</small><strong id="waFrameState">MENUNGGU</strong><span id="waFrameDetail">Status panel</span></div><div class="dm"><small>BROWSER</small><strong id="waBrowserState">AKTIF</strong><span id="waBrowserDetail">Fitur dasar</span></div><div class="dm"><small>LAST CHECK</small><strong id="waLastCheck">--:--:--</strong><span>Waktu lokal</span></div></div>
+    <div class="row" style="margin-bottom:12px"><button class="primary" id="waRunDiagnosis" type="button">⟳ JALANKAN DIAGNOSIS</button><button id="waTryReconnect" type="button">↻ COBA MUAT ULANG</button><button id="waOpenOfficial" type="button">↗ BUKA WHATSAPP RESMI</button></div>
+    <div class="dchat"><div class="dmsgs" id="waDoctorMessages" aria-live="polite"><div class="dmsg bot"><b>WA DOCTOR</b><p>Halo! Tekan <b style="display:inline;font:inherit;color:inherit">JALANKAN DIAGNOSIS</b> untuk memeriksa kenapa WhatsApp Web belum terhubung.</p></div></div>
+     <div class="dquick"><button type="button" data-wa-question="Kenapa panel WhatsApp kosong?">Panel kosong</button><button type="button" data-wa-question="Kenapa QR tidak muncul?">QR tidak muncul</button><button type="button" data-wa-question="Kenapa WhatsApp terus memuat?">Terus memuat</button><button type="button" data-wa-question="Bagaimana cara menghubungkan WhatsApp dengan aman?">Cara menghubungkan</button><button type="button" id="waClearChat">⌫ Bersihkan</button></div>
+     <form class="dcomp" id="waDoctorForm"><input id="waDoctorInput" type="text" maxlength="240" placeholder="Tulis kendala WhatsApp Web…" autocomplete="off"><button class="primary" type="submit">KIRIM ➤</button></form></div>
+    <div class="dlog" id="waDiagnosticLog">[BOOT] Menunggu pemeriksaan pertama…</div>
+    <p class="note">Diagnosis memeriksa jaringan &amp; perilaku panel di browser, bukan server WhatsApp. “Panel dimuat” tidak berarti sudah login. Jangan bagikan QR, OTP, PIN, atau isi pesan.</p>
+   </div>
+   <div class="notice"><b>Keamanan:</b> masuk hanya lewat halaman resmi WhatsApp. Sesi dikelola WhatsApp, bukan disimpan naviXU3. Logout dari perangkat bersama.</div>
+  </section>
+ </section>
+
+ <!-- SETTINGS -->
+ <section class="page" id="page-settings" data-page="settings">
+  <div class="ph"><div><span class="eyebrow">CONFIGURATION / 11</span><h1>SETTINGS</h1><p>Tema, efek, mode racing, alarm, dan perilaku GPS. Tersimpan otomatis.</p></div><div class="ph-tools"><span class="tag">AUTO SAVE</span><button class="fsbtn" data-fs="page" type="button">⛶ MODUL</button></div></div>
+  <section class="card"><h2>⚙ PREFERENSI</h2>
+   <div class="setgrid">
+    <label class="sw"><span>Tema<small>Dark / Light</small></span><select data-cfg="theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+    <label class="sw"><span>Efek visual<small>Full · Lite (hemat baterai) · Off</small></span><select data-cfg="fx"><option value="full">Full</option><option value="lite">Lite</option><option value="off">Off</option></select></label>
+    <label class="sw"><span>Mode Racing<small>Palet merah, jarum cepat, shift lights</small></span><input type="checkbox" data-cfg="racing"></label>
+    <label class="sw"><span>Satuan kecepatan</span><select data-cfg="unit"><option value="kmh">km/jam</option><option value="mph">mph</option></select></label>
+    <label class="sw"><span>Skala speedometer<small>Dalam km/jam</small></span><select data-cfg="dial" data-num="1"><option value="160">0–160</option><option value="240">0–240</option><option value="320">0–320</option></select></label>
+    <label class="sw"><span>Batas kecepatan<small>km/jam (5–200)</small></span><input type="number" min="5" max="200" data-cfg="limit"></label>
+    <label class="sw"><span>Alarm suara<small>Bunyi saat melewati batas</small></span><input type="checkbox" data-cfg="sound"></label>
+    <label class="sw"><span>Getar<small>Jika didukung perangkat</small></span><input type="checkbox" data-cfg="vibrate"></label>
+    <label class="sw"><span>Notifikasi sistem<small>Meminta izin browser</small></span><input type="checkbox" data-cfg="notify"></label>
+    <label class="sw"><span>Panduan suara<small>Navigasi &amp; peringatan (id-ID)</small></span><input type="checkbox" data-cfg="voice"></label>
+    <label class="sw"><span>Layar tetap menyala<small>Wake Lock (boros baterai)</small></span><input type="checkbox" data-cfg="wake"></label>
+    <label class="sw"><span>Simpan trip otomatis<small>Saat tombol Reset ditekan</small></span><input type="checkbox" data-cfg="autosave"></label>
+    <label class="sw"><span>GPS otomatis<small>Mulai saat dibuka bila izin sudah diberikan</small></span><input type="checkbox" data-cfg="autoGps"></label>
+    <label class="sw"><span>Peta mengikuti posisi<small>Saat navigasi aktif</small></span><input type="checkbox" data-cfg="follow"></label>
+   </div>
+   <div class="row" style="margin-top:16px"><button id="testAlarm2" type="button">🔔 Uji alarm</button><button id="resetCfg" type="button">↺ Reset pengaturan</button><button class="danger" id="wipeData" type="button">🗑 Hapus semua data</button></div>
+
+   <section class="card" id="navixu3UpdatePanel" style="margin-top:16px;border:1px solid var(--neon)">
+    <h2>↻ SYSTEM UPDATE · AUTO VERSION CONTROL</h2>
+    <p class="note">Pemeriksaan versi otomatis saat aplikasi dibuka dan setiap 5 menit. Memerlukan koneksi internet.</p>
+    <div class="setgrid">
+     <div class="sw"><span>VERSI TERPASANG<small id="navUpdateInstalled">1.0.1</small></span></div>
+     <div class="sw"><span>VERSI TERBARU<small id="navUpdateLatest">Memeriksa…</small></span></div>
+     <div class="sw"><span>STATUS UPDATE<small id="navUpdateStatus" role="status" aria-live="polite">MENYIAPKAN PEMERIKSAAN</small></span></div>
+     <div class="sw"><span>PEMERIKSAAN TERAKHIR<small id="navUpdateChecked">Belum diperiksa</small></span></div>
+    </div>
+    <p class="note" id="navUpdateNotes">Data lokal tetap dipertahankan selama pembaruan.</p>
+    <div class="row" style="margin-top:12px">
+     <button class="primary" id="navUpdateCheck" type="button">↻ PERIKSA SEKARANG</button>
+     <button id="navUpdateApply" type="button" hidden>⬆ TERAPKAN UPDATE</button>
+    </div>
+   </section>
+
+   <div class="card" style="margin-top:16px;border-color:var(--neon)">
+    <h2>🛡️ DATA VAULT · GITHUB PAGES SAFE</h2>
+    <p class="note">Pengaturan, riwayat perjalanan, favorit lokasi, dan data aplikasi disimpan pada browser/perangkat ini. Buat cadangan JSON secara berkala agar data dapat dipulihkan jika browser atau perangkat diganti.</p>
+    <div class="row" style="margin-top:12px">
+     <button class="primary" id="navBackupExport" type="button">⬇ EKSPOR BACKUP JSON</button>
+     <button id="navBackupImportBtn" type="button">⬆ PULIHKAN BACKUP</button>
+     <button id="navStorageCheck" type="button">▣ CEK PENYIMPANAN</button>
+     <input id="navBackupFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="navBackupStatus" class="note" role="status" aria-live="polite">LOCAL STORAGE READY · BACKUP MANUAL TERSEDIA</div>
+   </div>
+   <p class="note">Mode “Lite” otomatis aktif bila baterai &lt; 20% dan tidak mengisi daya. Animasi dijeda saat tab disembunyikan.</p></section>
+ </section>
+ <footer>R3PRO · Gunakan fitur hanya saat kendaraan berhenti. Utamakan keselamatan berkendara.</footer>
+</main>
+
+<script>
+'use strict';
+/* ========== util ========== */
+const $=id=>document.getElementById(id);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const pad=n=>String(n).padStart(2,'0');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const txt=(id,v)=>{const e=$(id);if(e&&e.textContent!==String(v))e.textContent=v};
+const on=(id,ev,fn)=>{const e=$(id);if(e)e.addEventListener(ev,fn)};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmtDur=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return(h?h+':':'')+pad(m)+':'+pad(s%60)};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function hav(a,b){const R=6371e3,p=Math.PI/180,x=Math.sin((b.lat-a.lat)*p/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin((b.lon-a.lon)*p/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+const fmtM=m=>m>=1000?(m/1000).toFixed(1)+' km':Math.round(m)+' m';
+function toast(m,t){const box=$('toasts');if(!box)return;const d=document.createElement('div');d.className='toast '+(t||'');d.textContent=m;box.appendChild(d);while(box.children.length>4)box.firstChild.remove();setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),320)},3800)}
+function log(m){const b=$('sysLog');if(!b)return;const p=document.createElement('p');p.textContent='['+new Date().toLocaleTimeString('id-ID',{hour12:false})+'] '+m;b.prepend(p);while(b.children.length>7)b.lastChild.remove()}
+function safe(name,fn){try{return fn()}catch(e){console.error('[naviXU3]',name,e);setTimeout(()=>toast('Modul '+name+': '+e.message,'err'),0)}}
+addEventListener('error',e=>{log('ERROR '+(e.message||''))});
+addEventListener('unhandledrejection',e=>{log('PROMISE '+((e.reason&&e.reason.message)||e.reason))});
+
+/* ========== state & settings ========== */
+const CFG_KEY='navixu3_cfg_v3',TRIP_KEY='navixu3_trip_history_v2',DRAFT_KEY='navixu3_draft_v1',POS_KEY='navixu3_lastpos';
+const DEF={theme:'dark',fx:'full',racing:false,gaugeTheme:'cyber',unit:'kmh',limit:80,dial:240,sound:true,vibrate:true,notify:false,voice:true,wake:false,autosave:true,autoGps:false,follow:true};
+const hadCfg=store.get(CFG_KEY,null)!==null;
+let cfg=Object.assign({},DEF,store.get(CFG_KEY,{}));
+if(!hadCfg){const ol=Number(localStorage.getItem('navixu3_speed_limit_v1'));if(ol>=5&&ol<=200)cfg.limit=ol}
+const S={speed:0,hasSpeed:false,fix:null,prev:null,anchor:null,over:false,lastAlert:0,bat:null,fxEff:'full',page:'home',compass:null,lastPosSave:0};
+const T={dist:0,max:0,elapsed:0,moving:0,series:[],lastS:-1,running:false};
+const kUnit=()=>cfg.unit==='mph'?0.621371:1;
+const unitTxt=()=>cfg.unit==='mph'?'MPH':'KM/H';
+const avgKmh=()=>T.moving>5?(T.dist/1000)/(T.moving/3600):0;
+const fmtDist=m=>cfg.unit==='mph'?(m/1609.344).toFixed(2)+' mi':(m/1000).toFixed(2)+' km';
+const fmtSpd=v=>Math.round(v*kUnit())+' '+(cfg.unit==='mph'?'mph':'km/h');
+const saveCfg=()=>store.set(CFG_KEY,cfg);
+function setCfg(k,v){cfg[k]=v;saveCfg();applyCfg()}
+let buildSig='';
+function fxLevel(){return cfg.fx==='full'&&S.bat&&!S.bat.charging&&S.bat.level<.2?'lite':cfg.fx}
+function applyCfg(){
+ const de=document.documentElement;S.fxEff=fxLevel();
+ de.dataset.theme=cfg.theme;de.dataset.fx=S.fxEff;de.dataset.racing=cfg.racing?'on':'off';
+ const speedCard=$('speedCard');if(speedCard)speedCard.dataset.gaugeTheme=cfg.gaugeTheme||'cyber';
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=cfg.theme==='light'?'#e8f1f8':(cfg.racing?'#0a0305':'#050b16');
+ const sig=cfg.dial+cfg.unit;if(sig!==buildSig){buildGauge();buildSig=sig}
+ syncCfgUI();galaxy();wakeSync();renderAll();scheduleChart();
+ if(NAV.routeLayer)NAV.routeLayer.setStyle({color:css('--neon')});
+ if(NAV.map)setTile(NAV.tileKind||'auto');
+}
+function syncCfgUI(){
+ document.querySelectorAll('[data-cfg]').forEach(el=>{const v=cfg[el.dataset.cfg];if(el.type==='checkbox')el.checked=!!v;else if(document.activeElement!==el)el.value=v});
+ txt('unitBtn',unitTxt());$('racingBtn')&&$('racingBtn').classList.toggle('on',cfg.racing);
+ $('followBtn')&&$('followBtn').classList.toggle('on',cfg.follow);$('voiceBtn')&&$('voiceBtn').classList.toggle('on',cfg.voice);
+ $('wakeBtn')&&$('wakeBtn').classList.toggle('on',cfg.wake);
+ const lim=$('speedLimit');if(lim&&document.activeElement!==lim)lim.value=cfg.limit;
+ txt('modeTag',cfg.racing?'RACING MODE':'GPS SENSOR');
+}
+async function askNotify(){
+ if(!('Notification' in window)){toast('Browser tidak mendukung notifikasi','warn');return false}
+ if(Notification.permission==='granted')return true;
+ if(Notification.permission==='denied'){toast('Notifikasi diblokir di pengaturan browser','warn');return false}
+ try{return (await Notification.requestPermission())==='granted'}catch(e){return false}
+}
+document.querySelectorAll('[data-cfg]').forEach(el=>el.addEventListener('change',async()=>{
+ const k=el.dataset.cfg;let v=el.type==='checkbox'?el.checked:el.value;
+ if(el.type==='number'||el.dataset.num)v=Number(v);
+ if(k==='limit'&&!(v>=5&&v<=200)){toast('Batas harus 5–200 km/jam','warn');syncCfgUI();return}
+ if(k==='gaugeTheme'&&!['cyber','ocean','racing','matrix','violet','sunset','ice','classic','stealth'].includes(v)){syncCfgUI();return}
+ if(k==='notify'&&v&&!(await askNotify())){v=false}
+ if(k==='wake'&&v&&!('wakeLock' in navigator)){toast('Wake Lock tidak didukung browser ini','warn');v=false}
+ setCfg(k,v);
+}));
+
+/* ========== audio / alerts ========== */
+let AC=null;
+function audioUnlock(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state==='suspended')AC.resume()}catch(e){}}
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,audioUnlock,{passive:true}));
+function beep(n){if(!AC)return false;try{const t=AC.currentTime;for(let i=0;i<n;i++){const o=AC.createOscillator(),g=AC.createGain(),s=t+i*.24;o.type='square';o.frequency.value=i%2?740:988;g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.22,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.2);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+.22)}return true}catch(e){return false}}
+function speak(t){if(!cfg.voice||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';speechSynthesis.speak(u)}catch(e){}}
+function pushNotify(title,body){if(cfg.notify&&'Notification' in window&&Notification.permission==='granted'){try{new Notification(title,{body,tag:'navixu3'})}catch(e){}}}
+function speedAlert(v,test){
+ const now=Date.now();if(!test&&now-S.lastAlert<8000)return;S.lastAlert=now;
+ const msg=test?'Uji alarm kecepatan':'Batas '+Math.round(cfg.limit*kUnit())+' terlampaui · '+fmtSpd(v);
+ txt('speedAlertStatus',msg.toUpperCase());toast(msg,'warn');
+ if(cfg.sound&&!beep(3)&&test)toast('Suara diblokir browser sampai ada interaksi layar','warn');
+ if(cfg.vibrate&&navigator.vibrate){try{navigator.vibrate([150,80,150,80,250])}catch(e){}}else if(test&&cfg.vibrate)toast('Getar tidak didukung perangkat ini','warn');
+ pushNotify('Peringatan kecepatan',msg);if(!test)speak('Perhatian, batas kecepatan terlampaui');log('ALARM '+msg);
+}
+function checkLimit(v){
+ const over=v>cfg.limit;
+ if(over){if(!S.over){S.over=true}speedAlert(v,false)}
+ else if(v<=cfg.limit-3&&S.over){S.over=false;txt('speedAlertStatus','NORMAL · LIMIT '+Math.round(cfg.limit*kUnit()))}
+ $('speedCard').classList.toggle('over',S.over);$('hudBox').classList.toggle('over',S.over);
+}
+
+/* ========== wake lock ========== */
+let WL=null;
+async function wakeSync(){
+ const want=cfg.wake&&!document.hidden;
+ if(want&&!WL&&'wakeLock' in navigator){try{WL=await navigator.wakeLock.request('screen');WL.addEventListener('release',()=>{WL=null;txt('wakeInfo','MATI')});txt('wakeInfo','AKTIF')}catch(e){txt('wakeInfo','DITOLAK')}}
+ else if(!cfg.wake&&WL){try{await WL.release()}catch(e){}WL=null;txt('wakeInfo','MATI')}
+ else if(!('wakeLock' in navigator))txt('wakeInfo','TIDAK DIDUKUNG');
+}
+
+/* ========== galaxy / particles ========== */
+const G={cv:null,x:null,w:0,h:0,stars:[],raf:0,last:0,dpr:1,pal:[]};
+function galaxySeed(){const f=S.fxEff,n=f==='full'?clamp(Math.round(G.w*G.h/9000),60,170):f==='lite'?34:0;G.stars=Array.from({length:n},()=>({x:Math.random()*G.w,y:Math.random()*G.h,z:Math.random()*.9+.1,tw:Math.random()*6.28,c:Math.floor(Math.random()*3)}))}
+function galaxy(){
+ if(!G.cv){G.cv=$('galaxy');G.x=G.cv&&G.cv.getContext('2d')}
+ if(!G.cv||!G.x)return;
+ cancelAnimationFrame(G.raf);G.raf=0;
+ if(S.fxEff==='off'){G.x.clearRect(0,0,G.cv.width,G.cv.height);return}
+ G.dpr=Math.min(devicePixelRatio||1,1.5);G.w=innerWidth;G.h=innerHeight;G.cv.width=Math.round(G.w*G.dpr);G.cv.height=Math.round(G.h*G.dpr);
+ G.pal=[css('--neon'),css('--violet'),css('--acid')];galaxySeed();G.last=performance.now();G.raf=requestAnimationFrame(galaxyLoop);
+}
+function galaxyLoop(now){
+ G.raf=requestAnimationFrame(galaxyLoop);
+ const gap=S.fxEff==='full'?24:55;if(now-G.last<gap)return;const dt=Math.min(.1,(now-G.last)/1000);G.last=now;
+ const x=G.x,sp=clamp(S.speed/110,0,2.2);x.setTransform(G.dpr,0,0,G.dpr,0,0);x.clearRect(0,0,G.w,G.h);x.lineCap='round';
+ for(const s of G.stars){
+  s.y+=(8+55*s.z*(1+sp*3))*dt;s.tw+=dt*2;if(s.y>G.h+20){s.y=-20;s.x=Math.random()*G.w}
+  x.globalAlpha=clamp((.25+.6*s.z)*(.65+.35*Math.sin(s.tw)),.05,.95);x.strokeStyle=G.pal[s.c];x.lineWidth=.6+s.z*1.5;
+  x.beginPath();x.moveTo(s.x,s.y);x.lineTo(s.x,s.y-(1+s.z*(1+sp*16)));x.stroke();
+ }
+ x.globalAlpha=1;
+}
+addEventListener('resize',()=>{clearTimeout(galaxy.t);galaxy.t=setTimeout(galaxy,250);scheduleChart();txt('viewInfo',innerWidth+'×'+innerHeight);if(NAV.map)NAV.map.invalidateSize()});
+document.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||S.fxEff!=='full')return;const t=e.target.closest&&e.target.closest('.tilt');if(!t)return;
+ const r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;t.style.setProperty('--rx',(-y*9).toFixed(1)+'deg');t.style.setProperty('--ry',(x*11).toFixed(1)+'deg');
+},{passive:true});
+document.addEventListener('pointerout',e=>{const t=e.target.closest&&e.target.closest('.tilt');if(t&&!t.contains(e.relatedTarget)){t.style.setProperty('--rx','0deg');t.style.setProperty('--ry','0deg')}});
+
+/* ========== fullscreen ========== */
+let fsPage=null;
+async function enterFs(page){
+ document.querySelectorAll('.module-fs').forEach(x=>x.classList.remove('module-fs'));
+ if(page){page.classList.add('module-fs');fsPage=page}
+ document.body.classList.add('fs-on');
+ try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}
+ setTimeout(()=>{NAV.map&&NAV.map.invalidateSize();scheduleChart()},300);
+}
+async function exitFs(){
+ document.querySelectorAll('.module-fs').forEach(x=>x.classList.remove('module-fs'));fsPage=null;document.body.classList.remove('fs-on');
+ if(document.fullscreenElement){try{await document.exitFullscreen()}catch(e){}}
+ setTimeout(()=>{NAV.map&&NAV.map.invalidateSize();scheduleChart()},300);
+}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('fs-on')&&$('hudBox').hidden)exitFs();if(!document.fullscreenElement&&!$('hudBox').hidden)closeHud()});
+on('fsExit','click',exitFs);
+document.querySelectorAll('.fsbtn').forEach(b=>b.addEventListener('click',()=>enterFs(b.dataset.fs==='app'?null:document.querySelector('.page.active'))));
+
+/* ========== navigation between pages ========== */
+const PAGES=[...document.querySelectorAll('.page')].map(p=>p.dataset.page);
+async function showPage(name){
+ if(!PAGES.includes(name))name='home';
+ if(document.body.classList.contains('fs-on'))await exitFs();
+ S.page=name;
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.dataset.page===name));
+ document.querySelectorAll('.nav [data-go]').forEach(b=>b.classList.toggle('selected',b.dataset.go===name));
+ $('main').scrollTop=0;log('Modul dibuka: '+name.toUpperCase());
+ if(name==='maps')safe('maps',openMaps);
+ if(name==='speed'){kickGauge();setTimeout(scheduleChart,60)}
+ if(name==='trip'){renderHistory();renderTrip();setTimeout(scheduleChart,60)}
+ if(name==='whatsapp')waLoad();
+ if(name==='connections')runDiag();
+ if(name==='orientation'){txt('viewInfo',innerWidth+'×'+innerHeight);txt('orientInfo',(screen.orientation&&screen.orientation.type)||(innerWidth>innerHeight?'landscape':'portrait'));wakeSync()}
+ if(name==='home')renderAll();
+}
+function go(n){if(location.hash==='#'+n)showPage(n);else location.hash=n}
+addEventListener('hashchange',()=>showPage(location.hash.slice(1)||'home'));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+
+/* ========== clock / network / battery ========== */
+function tick(){const d=new Date();txt('clock',d.toLocaleTimeString('id-ID',{hour12:false}));txt('date',d.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}));txt('receiverClock',d.toLocaleTimeString('id-ID',{hour12:false}))}
+tick();setInterval(tick,1000);
+const setDot=(id,state)=>{const e=$(id);if(!e)return;e.className='dot'+(state===true||state==='ok'?' ok':state==='warn'?' warn':state==='bad'?' bad':'')};
+function network(){
+ const n=navigator.connection,on=navigator.onLine;
+ const t=n?(n.effectiveType||n.type||'aktif')+(n.downlink?' · '+n.downlink+' Mbps':''):(on?'online':'offline');
+ txt('netStatus','Jaringan: '+t);txt('connectionType',on?t:'Offline');setDot('netDot',on?'ok':'bad');
+ txt('navMapNetwork',on?'OPENSTREETMAP · LIVE':'NETWORK OFFLINE');
+}
+network();addEventListener('online',network);addEventListener('offline',network);if(navigator.connection)navigator.connection.addEventListener('change',network);
+if(navigator.getBattery)navigator.getBattery().then(b=>{
+ const upd=()=>{S.bat={level:b.level,charging:b.charging};txt('batteryStatus','Baterai: '+Math.round(b.level*100)+'%'+(b.charging?' · mengisi':''));setDot('batDot',b.level<.2&&!b.charging?'bad':b.level<.4&&!b.charging?'warn':'ok');const f=fxLevel();if(f!==S.fxEff){S.fxEff=f;document.documentElement.dataset.fx=f;galaxy();if(f!==cfg.fx)toast('Baterai rendah: efek diturunkan ke Lite','warn')}};
+ upd();b.addEventListener('levelchange',upd);b.addEventListener('chargingchange',upd);
+}).catch(()=>{});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){saveDraft();cancelAnimationFrame(G.raf);G.raf=0}else{galaxy();wakeSync();kickGauge();scheduleChart()}});
+
+/* ========== gauge ========== */
+const G2={max:240,len:612,disp:0,raf:0,last:0};
+const polar=(r,f)=>{const a=(135+270*f)*Math.PI/180;return[180+r*Math.cos(a),160+r*Math.sin(a)]};
+function arcPath(f0,f1,r){r=r||130;const p0=polar(r,f0),p1=polar(r,f1);return 'M'+p0[0].toFixed(1)+' '+p0[1].toFixed(1)+' A'+r+' '+r+' 0 '+((f1-f0)*270>180?1:0)+' 1 '+p1[0].toFixed(1)+' '+p1[1].toFixed(1)}
+function buildGauge(){
+ const max=Math.round(cfg.dial*kUnit()/10)*10;G2.max=max;
+ const maj={100:20,150:30,160:20,200:40,240:40,320:40}[max]||40;
+ let h='';
+ for(let v=0;v<=max;v+=10){const f=v/max,M=v%maj===0,a=polar(M?106:115,f),b=polar(124,f);h+='<line class="g-tick'+(M?' maj':'')+'" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>';if(M){const l=polar(90,f);h+='<text class="g-lab" x="'+l[0].toFixed(1)+'" y="'+(l[1]+3).toFixed(1)+'">'+v+'</text>'}}
+ $('gaugeTicks').innerHTML=h;
+ $('gaugeTrack').setAttribute('d',arcPath(0,1));$('gaugeRed').setAttribute('d',arcPath(.85,1,141));
+ const p=$('gaugeProgress');p.setAttribute('d',arcPath(0,1));try{G2.len=p.getTotalLength()||612}catch(e){G2.len=612}
+ p.style.strokeDasharray=G2.len;
+ const bars=[$('shiftLights'),$('hudBars')];bars.forEach(b=>{if(b&&!b.children.length)for(let i=0;i<14;i++){const e=document.createElement('i');e.className=i>=10?'r':i>=5?'m':'';b.appendChild(e)}});
+ txt('speedUnit',unitTxt());txt('hudUnit',unitTxt());txt('homeUnit',unitTxt());setGauge(G2.disp);
+}
+function setGauge(v){
+ const f=clamp(v/G2.max,0,1);
+ $('gaugeNeedle').setAttribute('transform','rotate('+(-135+270*f).toFixed(2)+' 180 160)');
+ const p=$('gaugeProgress');p.style.strokeDashoffset=(G2.len*(1-f)).toFixed(1);
+ p.style.stroke=f>.85?'var(--red)':f>.68?'var(--warn)':'url(#arcGrad)';
+ const lit=Math.round(f*14);
+ ['shiftLights','hudBars'].forEach(id=>{const b=$(id);if(!b)return;for(let i=0;i<b.children.length;i++)b.children[i].classList.toggle('on',i<lit)});
+}
+function gaugeLoop(ts){
+ G2.raf=0;if(document.hidden||(S.page!=='speed'&&$('hudBox').hidden))return;
+ const target=S.speed*kUnit(),dt=Math.min(.1,(ts-G2.last)/1000||.016);G2.last=ts;
+ if(S.fxEff==='off')G2.disp=target;else G2.disp+=(target-G2.disp)*(1-Math.exp(-dt*(cfg.racing?14:8)));
+ if(Math.abs(target-G2.disp)<.05)G2.disp=target;
+ setGauge(G2.disp);if(G2.disp!==target)G2.raf=requestAnimationFrame(gaugeLoop);
+}
+function kickGauge(){if(!G2.raf){G2.last=performance.now();G2.raf=requestAnimationFrame(gaugeLoop)}}
+
+/* ========== chart ========== */
+let chartPending=false;
+function scheduleChart(){if(chartPending)return;chartPending=true;requestAnimationFrame(()=>{chartPending=false;drawChart($('speedChart'));drawChart($('tripChart'))})}
+function niceMax(v){const s=[20,40,60,80,100,120,160,200,240,320,400];return s.find(x=>x>=v)||Math.ceil(v/100)*100}
+function drawChart(cv){
+ if(!cv||!cv.getClientRects().length)return;
+ const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+ if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+ const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+ const neon=css('--neon'),muted=css('--muted'),line=css('--line'),k=kUnit(),L=36,R=8,Tp=10,B=18,pw=w-L-R,ph=h-Tp-B;
+ const d=T.series,top=niceMax(Math.max(T.max*k,cfg.limit*k*.6,20)*1.08);
+ x.font='9px ui-monospace,monospace';x.textAlign='right';x.fillStyle=muted;x.strokeStyle=line;x.lineWidth=1;
+ for(let i=0;i<=4;i++){const y=Tp+ph*(1-i/4);x.globalAlpha=.45;x.beginPath();x.moveTo(L,y);x.lineTo(w-R,y);x.stroke();x.globalAlpha=1;x.fillText(Math.round(top*i/4),L-5,y+3)}
+ if(d.length<2){x.textAlign='center';x.fillText('Menunggu data GPS…',w/2,h/2);return}
+ const tmax=Math.max(d[d.length-1][0],10),px=t=>L+t/tmax*pw,py=v=>Tp+ph*(1-clamp(v*k/top,0,1));
+ x.textAlign='center';x.fillText(fmtDur(0),L+10,h-4);x.fillText(fmtDur(tmax),w-R-14,h-4);
+ const gr=x.createLinearGradient(0,Tp,0,Tp+ph);gr.addColorStop(0,neon+'88');gr.addColorStop(1,neon+'05');
+ x.beginPath();x.moveTo(px(d[0][0]),Tp+ph);d.forEach(p=>x.lineTo(px(p[0]),py(p[1])));x.lineTo(px(d[d.length-1][0]),Tp+ph);x.closePath();x.fillStyle=gr;x.fill();
+ x.beginPath();d.forEach((p,i)=>i?x.lineTo(px(p[0]),py(p[1])):x.moveTo(px(p[0]),py(p[1])));x.strokeStyle=neon;x.lineWidth=2;x.lineJoin='round';if(S.fxEff==='full'){x.shadowColor=neon;x.shadowBlur=8}x.stroke();x.shadowBlur=0;
+ const dash=(v,c)=>{if(v*k>top)return;x.setLineDash([5,4]);x.strokeStyle=c;x.lineWidth=1;x.beginPath();x.moveTo(L,py(v));x.lineTo(w-R,py(v));x.stroke();x.setLineDash([])};
+ dash(cfg.limit,css('--red'));if(avgKmh()>0)dash(avgKmh(),css('--acid'));
+ const lp=d[d.length-1];x.fillStyle='#fff';x.beginPath();x.arc(px(lp[0]),py(lp[1]),3.5,0,6.283);x.fill();
+}
+
+/* ========== GPS engine ========== */
+const GPS={watch:null,users:new Set()};
+function setGpsUI(st){
+ const m={off:['GPS: nonaktif','GPS belum aktif',false,'GPS STANDBY','MENUNGGU GPS'],connecting:['GPS: menghubungkan…','GPS menghubungkan…','warn','GPS CONNECTING','MENGHUBUNGKAN SENSOR'],live:['GPS: aktif','GPS aktif',true,'GPS LIVE','GPS SIGNAL LOCKED'],weak:['GPS: sinyal lemah','GPS sinyal lemah','warn','GPS WEAK','SINYAL LEMAH'],search:['GPS: mencari kecepatan','GPS mencari…','warn','GPS SEARCH','MENCARI KECEPATAN'],stopped:['GPS: dihentikan','GPS berhenti',false,'GPS STANDBY','TRACKING STOPPED'],denied:['GPS: izin ditolak','Izin lokasi ditolak','bad','GPS ERROR','IZIN LOKASI DITOLAK'],unavail:['GPS: tidak tersedia','GPS tidak tersedia','bad','GPS ERROR','GPS TIDAK TERSEDIA'],timeout:['GPS: timeout','GPS timeout','warn','GPS TIMEOUT','GPS TIMEOUT']}[st];
+ if(!m)return;txt('gpsStatus',m[0]);txt('gpsHeader',m[1]);setDot('gpsDot',m[2]);setDot('gpsDot2',m[2]);setDot('raceStateDot',m[2]);txt('raceGpsBadge',m[3]);txt('raceSensorState',m[4]);
+ if(st==='stopped'||st==='off')txt('raceFix','STOPPED');if(st==='denied'||st==='unavail')txt('raceFix','NO FIX');
+}
+GPS.start=function(u){
+ if(!navigator.geolocation){toast('Browser tidak mendukung GPS','err');return false}
+ if(!window.isSecureContext){toast('GPS memerlukan HTTPS (atau localhost). Buka halaman lewat alamat https://','err');txt('speedCaption','GPS BUTUH HTTPS');return false}
+ GPS.users.add(u);T.running=true;
+ if(GPS.watch===null){setGpsUI('connecting');txt('speedCaption','MENGHUBUNGKAN SENSOR GPS…');GPS.watch=navigator.geolocation.watchPosition(onPos,onGpsErr,{enableHighAccuracy:true,maximumAge:0,timeout:25000});log('GPS dimulai ('+u+')');wakeSync()}
+ return true;
+};
+GPS.stop=function(u){
+ GPS.users.delete(u);if(GPS.users.size)return;
+ if(GPS.watch!==null){navigator.geolocation.clearWatch(GPS.watch);GPS.watch=null}
+ T.running=false;S.prev=null;S.anchor=null;S.speed=0;S.hasSpeed=false;S.over=false;
+ setGpsUI('stopped');txt('speedCaption','GPS TRACKING STOPPED');saveDraft();renderAll();kickGauge();log('GPS dihentikan');
+};
+function onGpsErr(e){
+ if(e.code===1){if(GPS.watch!==null)navigator.geolocation.clearWatch(GPS.watch);GPS.watch=null;GPS.users.clear();T.running=false;setGpsUI('denied');toast('Izin lokasi ditolak. Aktifkan izin lokasi untuk situs ini.','err')}
+ else if(e.code===3)setGpsUI('timeout');else setGpsUI('unavail');
+ txt('speedCaption',e.code===1?'IZIN LOKASI DITOLAK':'MENCARI SINYAL GPS…');log('GPS error '+e.code+': '+e.message);
+}
+function onPos(pos){
+ const c=pos.coords,acc=Number(c.accuracy)||999,ts=pos.timestamp||Date.now();
+ const f={lat:c.latitude,lon:c.longitude,acc,alt:Number.isFinite(c.altitude)?c.altitude:null,hd:Number.isFinite(c.heading)?c.heading:null,t:Date.now(),ts};
+ S.fix=f;
+ let raw=Number.isFinite(c.speed)&&c.speed>=0?c.speed*3.6:null;
+ if(raw===null&&S.prev&&acc<=40){const dt=(ts-S.prev.ts)/1000;if(dt>=.8&&dt<=10){const d=hav(S.prev,f);raw=d<Math.max(2,acc*.3)?0:d/dt*3.6}}
+ S.prev=f;
+ const valid=acc<=60&&raw!==null&&raw<=400;
+ if(valid){if(raw<1.2)raw=0;S.speed=S.hasSpeed?S.speed*.45+raw*.55:raw;if(raw===0&&S.speed<.8)S.speed=0;S.hasSpeed=true;T.max=Math.max(T.max,S.speed)}
+ if(acc<=30){
+  if(!S.anchor)S.anchor=f;
+  else{const d=hav(S.anchor,f);if(d>=Math.max(2.5,acc*.35)&&d<300){if(S.speed>1.5||d>acc)T.dist+=d;S.anchor=f}}
+ }
+ if(valid){
+  if(T.elapsed-T.lastS>=1){T.series.push([Math.round(T.elapsed),Math.round(S.speed*10)/10]);T.lastS=T.elapsed;if(T.series.length>700)T.series=T.series.filter((_,i)=>i%2===0);scheduleChart()}
+  checkLimit(S.speed);
+ }
+ if(Date.now()-S.lastPosSave>15000){S.lastPosSave=Date.now();store.set(POS_KEY,{lat:f.lat,lon:f.lon})}
+ setGpsUI(valid?'live':(acc>60?'weak':'search'));
+ txt('raceFix',valid?'LOCKED':'ACC '+Math.round(acc)+'M');
+ txt('speedCaption',valid?'LIVE GPS TELEMETRY · '+Math.round(acc)+'M':(acc>60?'SINYAL LEMAH · MENUNGGU':'MENUNGGU KECEPATAN VALID'));
+ txt('mapGpsFix','LOCKED · '+Math.round(acc)+'M');txt('mapLinkStatus','GPS CONNECTED');
+ if(f.hd!==null&&S.speed>3)txt('heading',compassLabel(f.hd));
+ safe('nav',()=>navOnFix(f));renderAll();kickGauge();
+}
+function compassLabel(deg){if(!Number.isFinite(deg))return '--';return ['U','TL','T','TG','S','BD','B','BL'][Math.round(((deg%360)+360)%360/45)%8]+' · '+Math.round(deg)+'°'}
+const compassHandler=e=>{const h=Number.isFinite(e.webkitCompassHeading)?e.webkitCompassHeading:(e.absolute&&Number.isFinite(e.alpha)?(360-e.alpha):NaN);if(Number.isFinite(h)&&!(S.fix&&S.fix.hd!==null&&S.speed>3))txt('heading',compassLabel(h))};
+addEventListener('deviceorientationabsolute',compassHandler,{passive:true});addEventListener('deviceorientation',e=>{if(Number.isFinite(e.webkitCompassHeading))compassHandler(e)},{passive:true});
+let lastTick=performance.now();
+setInterval(()=>{
+ const n=performance.now(),dt=Math.min(5,(n-lastTick)/1000);lastTick=n;
+ if(T.running){T.elapsed+=dt;if(S.speed>3)T.moving+=dt;renderTrip()}
+ if(T.running&&S.fix&&Date.now()-S.fix.t>8000&&S.speed>0){S.speed=0;txt('speedCaption','DATA GPS BARU TIDAK DITERIMA');renderAll();kickGauge()}
+},500);
+setInterval(saveDraft,10000);addEventListener('beforeunload',saveDraft);addEventListener('pagehide',saveDraft);
+function saveDraft(){if(T.dist>0||T.elapsed>0)store.set(DRAFT_KEY,{dist:T.dist,max:T.max,elapsed:T.elapsed,moving:T.moving,series:T.series,lastS:T.lastS})}
+function loadDraft(){const d=store.get(DRAFT_KEY,null);if(d&&(d.dist>0||d.elapsed>0)){Object.assign(T,{dist:d.dist||0,max:d.max||0,elapsed:d.elapsed||0,moving:d.moving||0,series:Array.isArray(d.series)?d.series:[],lastS:d.lastS||-1});log('Sesi sebelumnya dipulihkan ('+fmtDist(T.dist)+')');return true}return false}
+
+/* ========== render ========== */
+function renderTrip(){
+ const t=fmtDur(T.elapsed);txt('raceDuration',t);txt('duration',t);txt('homeTime',t);
+ txt('raceDistance',fmtDist(T.dist));txt('distance',fmtDist(T.dist));txt('homeDist',fmtDist(T.dist));
+ const a=avgKmh();txt('avgSpeed',a?fmtSpd(a):'--');txt('tripAvg',a?fmtSpd(a):'--');
+ const m=T.max?fmtSpd(T.max):'--';txt('maxSpeed',m);txt('tripMax',m);txt('homeTop',m);
+}
+function renderAll(){
+ const k=kUnit(),v=S.speed*k,s=S.hasSpeed?String(Math.round(v)):'---';
+ txt('speedValue',s);txt('homeSpeed',s);txt('hudSpeed',S.hasSpeed?String(Math.round(v)):'0');
+ txt('navLiveSpeed',S.hasSpeed?Math.round(v)+' '+(cfg.unit==='mph'?'mph':'km/h'):'--');
+ txt('hudInfo',fmtDist(T.dist)+'  ·  TOP '+(T.max?Math.round(T.max*k):'--')+'  ·  '+fmtDur(T.elapsed));
+ const f=S.fix;
+ if(f){
+  txt('accuracy',Math.round(f.acc)+' m');txt('altitude',f.alt!==null?Math.round(f.alt)+' m':'--');
+  txt('gpsQuality',f.acc<=8?'EXCELLENT':f.acc<=20?'GOOD':f.acc<=45?'FAIR':'WEAK');
+  const c=f.lat.toFixed(5)+', '+f.lon.toFixed(5);txt('coords',c);txt('coordsSpeed',c);
+ }
+ renderTrip();
+}
+
+/* ========== trips ========== */
+function saveTrip(manual){
+ if(T.dist<20&&T.elapsed<10){if(manual)toast('Belum ada data perjalanan untuk disimpan','warn');return false}
+ const items=store.get(TRIP_KEY,[]);
+ items.push({id:Date.now(),date:new Date().toISOString(),distance:(T.dist/1000).toFixed(2),duration:fmtDur(T.elapsed),max:Math.round(T.max),average:avgKmh().toFixed(1)});
+ store.set(TRIP_KEY,items.slice(-250));renderHistory();toast('Perjalanan disimpan ('+(T.dist/1000).toFixed(2)+' km)');log('Trip tersimpan');return true;
+}
+function renderHistory(){
+ const items=store.get(TRIP_KEY,[]),box=$('tripHistoryList');if(!box)return;
+ box.innerHTML=items.length?items.map((x,i)=>({x,i})).reverse().map(({x,i})=>'<div class="hi"><div><strong>'+esc(new Date(x.date).toLocaleString('id-ID'))+'</strong><small>Durasi '+esc(x.duration)+' · Maks '+esc(x.max)+' km/jam · Rata-rata '+esc(x.average||'0')+'</small></div><div><strong>'+esc(x.distance)+' km</strong></div><button type="button" data-del="'+i+'">Hapus</button></div>').join(''):'Belum ada perjalanan tersimpan.';
+ const tot=items.reduce((a,x)=>{a.d+=parseFloat(x.distance)||0;a.m=Math.max(a.m,Number(x.max)||0);return a},{d:0,m:0});
+ $('tripTotals').textContent=items.length?items.length+' perjalanan · total '+tot.d.toFixed(2)+' km · top speed '+tot.m+' km/jam':'Belum ada data.';
+}
+on('tripHistoryList','click',e=>{const b=e.target.closest('[data-del]');if(!b)return;const items=store.get(TRIP_KEY,[]);items.splice(Number(b.dataset.del),1);store.set(TRIP_KEY,items);renderHistory()});
+on('saveTrip','click',()=>saveTrip(true));
+on('clearTrips','click',()=>{if(confirm('Hapus seluruh riwayat perjalanan di perangkat ini?')){store.del(TRIP_KEY);renderHistory()}});
+on('exportTrips','click',()=>{
+ const items=store.get(TRIP_KEY,[]);if(!items.length){toast('Belum ada riwayat untuk diekspor','warn');return}
+ const rows=[['Tanggal','Jarak km','Durasi','Maks km/jam','Rata-rata km/jam'],...items.map(x=>[x.date,x.distance,x.duration,x.max,x.average])];
+ const csv=rows.map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='naviXU3-riwayat-perjalanan.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+function resetTrip(){
+ if(cfg.autosave&&T.dist>=50)saveTrip(false);
+ Object.assign(T,{dist:0,max:0,elapsed:0,moving:0,series:[],lastS:-1});S.anchor=null;store.del(DRAFT_KEY);
+ txt('speedAlertStatus','ALERT STANDBY');renderAll();scheduleChart();toast('Trip direset');
+}
+
+/* ========== speed page controls ========== */
+const startGps=()=>{audioUnlock();GPS.start('speed')};
+on('startGps','click',startGps);on('homeStart','click',startGps);
+on('stopGps','click',()=>GPS.stop('speed'));on('homeStop','click',()=>GPS.stop('speed'));
+on('resetTrip','click',resetTrip);
+on('unitBtn','click',()=>setCfg('unit',cfg.unit==='kmh'?'mph':'kmh'));
+on('racingBtn','click',()=>{setCfg('racing',!cfg.racing);toast(cfg.racing?'Mode Racing aktif':'Mode Racing mati')});
+on('saveSpeedLimit','click',()=>{const n=Number($('speedLimit').value);if(!(n>=5&&n<=200)){toast('Masukkan 5–200 km/jam','warn');return}setCfg('limit',n);S.over=false;toast('Batas kecepatan: '+n+' km/jam')});
+on('speedLimit','keydown',e=>{if(e.key==='Enter')$('saveSpeedLimit').click()});
+const testAlarm=()=>{audioUnlock();speedAlert(cfg.limit+10,true)};on('testAlarm','click',testAlarm);on('testAlarm2','click',testAlarm);
+/* HUD */
+async function openHud(){
+ $('hudBox').hidden=false;renderAll();kickGauge();setGauge(G2.disp);
+ try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}
+ if(!cfg.wake){try{WL=await navigator.wakeLock.request('screen')}catch(e){}}
+}
+function closeHud(){$('hudBox').hidden=true;if(document.fullscreenElement&&!document.body.classList.contains('fs-on'))document.exitFullscreen().catch(()=>{});if(!cfg.wake&&WL){WL.release().catch(()=>{});WL=null}}
+on('hudBtn','click',openHud);on('hudClose','click',closeHud);on('hudMirror','click',()=>$('hudBox').classList.toggle('mir'));
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('hudBox').hidden)closeHud()});
+
+/* ========== maps / navigation ========== */
+const NAV={map:null,user:null,acc:null,destMarker:null,wpMarkers:[],routeLayer:null,casing:null,route:null,steps:[],cum:[],total:0,active:false,idx:0,off:0,lastReroute:0,announced:new Set(),waypoints:[],pending:[],tileLayer:null,tileKind:'',destInfo:null,destQuery:'',geoCache:new Map(),busy:false,curStep:-1};
+const fetchT=(url,ms,opt)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||14000);return fetch(url,Object.assign({},opt,{signal:c.signal})).finally(()=>clearTimeout(t))};
+function ensureLeaflet(){
+ if(window.L)return Promise.resolve();
+ const srcs=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'];
+ return new Promise((res,rej)=>{let i=0;const next=()=>{if(window.L)return res();if(i>=srcs.length)return rej(new Error('Mesin peta gagal dimuat. Periksa internet lalu muat ulang halaman.'));const s=document.createElement('script');s.src=srcs[i++];s.crossOrigin='anonymous';s.onload=()=>window.L?res():next();s.onerror=next;document.head.appendChild(s)};next()});
+}
+async function openMaps(){
+ try{await ensureLeaflet();initMap();requestAnimationFrame(()=>{if(NAV.map){NAV.map.invalidateSize({pan:false});setTimeout(()=>NAV.map&&NAV.map.invalidateSize({pan:false}),250)}})}
+ catch(e){txt('mapLinkStatus','ENGINE ERROR');txt('navInstruction','Peta gagal dimuat');txt('navDistanceNext',e.message);toast(e.message,'err')}
+}
+function setTile(kind){
+ if(!NAV.map)return;
+ if(kind==='auto')kind=cfg.theme==='light'?'osm':'dark';
+ if(NAV.tileLayer&&NAV.tileKind===kind)return;
+ if(NAV.tileLayer)NAV.map.removeLayer(NAV.tileLayer);
+ NAV.tileKind=kind;
+ const lyr=kind==='dark'?L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'}):L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'});
+ let failed=false;lyr.on('tileerror',()=>{if(failed||kind!=='dark')return;failed=true;setTile('osm')});
+ lyr.addTo(NAV.map);NAV.tileLayer=lyr;
+}
+const WXMAP={layer:null,enabled:false,frames:[],lastFetch:0};
+async function updateWeatherRadar(){
+ const status=$('wxRadarStatus');if(!navigator.onLine){if(status)status.textContent='OFFLINE · radar tidak dapat diperbarui';return}
+ try{
+  const r=await fetchT('https://api.rainviewer.com/public/weather-maps.json',12000,{cache:'no-store'});if(!r.ok)throw new Error('Radar HTTP '+r.status);
+  const j=await r.json(),frames=j.radar?.past||[];if(!frames.length)throw new Error('Frame radar belum tersedia');WXMAP.frames=frames;WXMAP.lastFetch=Date.now();
+  const frame=frames[frames.length-1];if(WXMAP.enabled&&NAV.map){if(WXMAP.layer)NAV.map.removeLayer(WXMAP.layer);const url=j.host+frame.path+'/256/{z}/{x}/{y}/2/1_1.png';WXMAP.layer=L.tileLayer(url,{tileSize:256,opacity:.72,transparent:true,maxZoom:7,attribution:'Radar: <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a>'});WXMAP.layer.addTo(NAV.map);}
+  if(status)status.textContent='RADAR '+new Date(frame.time*1000).toLocaleTimeString('id-ID')+' · frame terbaru tersedia';
+ }catch(e){if(status)status.textContent='RADAR TIDAK TERSEDIA · '+e.message;}
+}
+function toggleWeatherRadar(force){
+ WXMAP.enabled=typeof force==='boolean'?force:!WXMAP.enabled;const b=$('wxRadarToggle');if(b){b.classList.toggle('on',WXMAP.enabled);b.textContent='🌧 RADAR HUJAN: '+(WXMAP.enabled?'ON':'OFF')}
+ if(!NAV.map){if(WXMAP.enabled)openMaps();return}
+ if(WXMAP.enabled){updateWeatherRadar()}else if(WXMAP.layer){NAV.map.removeLayer(WXMAP.layer);WXMAP.layer=null}
+}
+$('wxRadarToggle')?.addEventListener('click',()=>toggleWeatherRadar());
+$('wxRadarRefresh')?.addEventListener('click',()=>updateWeatherRadar());
+setInterval(()=>{if(WXMAP.enabled&&document.visibilityState==='visible')updateWeatherRadar()},10*60*1000);
+function validPoint(p){
+ return !!p&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lon))&&Math.abs(Number(p.lat))<=90&&Math.abs(Number(p.lon))<=180;
+}
+function initMap(){
+ if(NAV.map||!window.L)return;
+ const raw=store.get(POS_KEY,null),lp=validPoint(raw)?{lat:Number(raw.lat),lon:Number(raw.lon)}:null;
+ const canvas=$('mapCanvas');if(!canvas)throw new Error('Elemen peta tidak ditemukan. Muat ulang halaman.');
+ NAV.map=L.map(canvas,{zoomControl:true,preferCanvas:true}).setView(lp?[lp.lat,lp.lon]:[-2.5,118],lp?15:5);
+ setTile('auto');
+ NAV.user=L.marker(lp?[lp.lat,lp.lon]:[-2.5,118],{icon:pinIcon('●','user'),zIndexOffset:1200,pane:'markerPane'}).addTo(NAV.map).bindPopup('LOKASI SAYA');
+ NAV.acc=L.circle(lp?[lp.lat,lp.lon]:[-2.5,118],{radius:0,color:'#25eaff',weight:1,fillOpacity:.08}).addTo(NAV.map);
+ txt('mapLinkStatus',navigator.onLine?'OSM / ONLINE':'OFFLINE');
+ if(WXMAP.enabled)updateWeatherRadar();
+ NAV.map.on('dragstart',()=>{if(NAV.active&&cfg.follow){setCfg('follow',false);toast('Mode ikuti dimatikan (peta digeser). Tekan ◎ IKUTI untuk kembali.')}});
+}
+async function geocode(q){
+ const clean=q.trim();if(!clean)throw new Error('Masukkan nama tempat atau alamat.');
+ if(NAV.geoCache.has(clean))return NAV.geoCache.get(clean);
+ const errs=[],bias=S.fix?'&lat='+S.fix.lat+'&lon='+S.fix.lon:'';
+ for(const qq of [clean,clean+', Indonesia']){
+  try{const r=await fetchT('https://photon.komoot.io/api/?limit=8&lang=id'+bias+'&q='+encodeURIComponent(qq),12000);if(!r.ok)throw new Error('Photon '+r.status);const j=await r.json(),ft=(j.features||[]).find(x=>x.geometry&&x.geometry.coordinates&&x.geometry.coordinates.length===2);
+   if(ft){const p=ft.properties||{},res={lat:ft.geometry.coordinates[1],lon:ft.geometry.coordinates[0],name:p.name||clean,display:[p.name,p.street,p.city||p.county,p.state].filter(Boolean).join(', ')||clean};NAV.geoCache.set(clean,res);return res}}catch(e){errs.push(e.message)}
+ }
+ for(const qq of [clean,clean+', Indonesia']){
+  try{const r=await fetchT('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=id&limit=8&q='+encodeURIComponent(qq),14000);if(!r.ok)throw new Error('Nominatim '+r.status);const a=await r.json(),f=a.find(x=>isFinite(+x.lat)&&isFinite(+x.lon));
+   if(f){const res={lat:+f.lat,lon:+f.lon,name:f.name||clean,display:f.display_name||clean};NAV.geoCache.set(clean,res);return res}}catch(e){errs.push(e.message)}
+ }
+ throw new Error('Tujuan "'+clean+'" tidak ditemukan. Coba nama tempat + kecamatan/kota. ('+errs.slice(0,2).join(' / ')+')');
+}
+function getPos(){
+ return new Promise((res,rej)=>{
+  if(S.fix&&Date.now()-S.fix.t<8000&&Number(S.fix.acc)<=25)return res({lat:S.fix.lat,lon:S.fix.lon,acc:S.fix.acc});
+  if(!navigator.geolocation)return rej(new Error('Browser tidak mendukung GPS.'));
+  if(!window.isSecureContext)return rej(new Error('GPS membutuhkan HTTPS. Buka lewat alamat https://, bukan file lokal.'));
+  navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}),e=>rej(new Error(e.code===1?'Izin lokasi ditolak. Aktifkan izin lokasi untuk browser.':e.code===2?'Lokasi belum tersedia. Aktifkan GPS dan coba di area terbuka.':'GPS terlalu lama merespons. Coba ulang.')),{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+ });
+}
+async function osrm(base,coords){const r=await fetchT(base+'/route/v1/driving/'+coords+'?overview=full&geometries=geojson&steps=true&alternatives=true',18000);if(!r.ok)throw new Error('Routing '+r.status);const d=await r.json();if(d.code!=='Ok'||!d.routes||!d.routes.length)throw new Error(d.message||d.code||'Rute tidak ditemukan');return d.routes.slice().sort((a,b)=>{
+ const score=x=>(Number(x.distance)||1e12)*0.55+(Number(x.duration)||1e12)*8;
+ return score(a)-score(b)
+ })[0]}
+async function brouter(coords){
+ const r=await fetchT('https://brouter.de/brouter?lonlats='+encodeURIComponent(coords.split(';').join('|'))+'&profile=car-fast&alternativeidx=0&format=geojson',22000);if(!r.ok)throw new Error('BRouter '+r.status);
+ const d=await r.json(),ft=d.type==='Feature'?d:(d.features||[]).find(f=>f.geometry&&f.geometry.type==='LineString');if(!ft||!ft.geometry.coordinates.length)throw new Error('BRouter tanpa geometri');
+ const ln=ft.geometry.coordinates;let dist=Number((ft.properties||{})['track-length'])||0;if(!dist)for(let i=1;i<ln.length;i++)dist+=hav({lat:ln[i-1][1],lon:ln[i-1][0]},{lat:ln[i][1],lon:ln[i][0]});
+ return{distance:dist,duration:dist/35*3.6,geometry:ft.geometry,legs:[],_fallback:'BRouter'};
+}
+async function getRoute(coords){
+ const errs=[];
+ for(const b of ['https://router.project-osrm.org','https://routing.openstreetmap.de/routed-car']){try{return await osrm(b,coords)}catch(e){errs.push(e.message)}}
+ try{return await brouter(coords)}catch(e){errs.push(e.message)}
+ throw new Error('Semua mesin rute tidak merespons. Coba lagi sebentar lagi. ('+errs.join(' | ')+')');
+}
+
+/* NAVIXU3 ROAD QUALITY ADVISORY
+   OpenStreetMap tags describe mapped road class/surface, not live physical condition.
+   Missing tags are reported as unknown; they are never guessed. */
+async function auditRoadQuality(route){
+ const status=$('roadConditionStatus'),surface=$('roadSurfaceStatus'),stamp=$('roadDataTime');
+ const set=(a,b,c)=>{if(status)status.textContent=a;if(surface)surface.textContent=b;if(stamp)stamp.textContent=c};
+ set('MEMERIKSA DATA PETA…','MENUNGGU','OSM · PEMERIKSAAN ONLINE');
+ const line=route&&route.geometry&&route.geometry.coordinates||[];
+ if(!line.length){set('TIDAK ADA GEOMETRI','TIDAK DIKETAHUI','TIDAK TERSEDIA');return}
+ // Sample points along the returned route to keep the public map query small.
+ const samples=[];const count=Math.min(7,line.length);
+ for(let i=0;i<count;i++){const idx=Math.round(i*(line.length-1)/Math.max(1,count-1));samples.push(line[idx])}
+ const clauses=samples.map(([lon,lat])=>`way(around:12,${lat},${lon})[highway];`).join('');
+ const q=`[out:json][timeout:12];(${clauses});out tags geom;`;
+ try{
+  const r=await fetchT('https://overpass-api.de/api/interpreter',15000,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:'data='+encodeURIComponent(q)});
+  if(!r.ok)throw new Error('Overpass HTTP '+r.status);
+  const data=await r.json(),ways=(data.elements||[]).filter(x=>x.type==='way'&&x.geometry&&x.geometry.length);
+  if(!ways.length){set('DATA JALAN TIDAK DITEMUKAN','KONDISI TIDAK DIKETAHUI','OSM · '+new Date().toLocaleTimeString('id-ID'));return}
+  const havM=(a,b)=>approxM(a[1],a[0],b[1],b[0]);
+  const matched=[];
+  for(const pt of samples){
+   let best=null,bd=Infinity;
+   for(const w of ways)for(const g of w.geometry){const d=havM(pt,g);if(d<bd){bd=d;best=w}}
+   if(best&&bd<=18)matched.push(best.tags||{});
+  }
+  if(!matched.length){set('JALAN TIDAK TERKONFIRMASI','DATA PETA KURANG','OSM · '+new Date().toLocaleTimeString('id-ID'));return}
+  const badHighway=new Set(['track','path','footway','bridleway','cycleway','steps','pedestrian']);
+  const badSurface=new Set(['unpaved','ground','dirt','earth','mud','sand','gravel','fine_gravel','grass']);
+  const badSmooth=new Set(['bad','very_bad','horrible','very_horrible','impassable']);
+  const flagged=matched.filter(t=>badHighway.has(t.highway)||badSurface.has(t.surface)||badSmooth.has(t.smoothness));
+  const knownSurface=matched.filter(t=>t.surface);
+  const unique=[...new Set(flagged.map(t=>[t.highway,t.surface,t.smoothness].filter(Boolean).join('/')))].slice(0,3);
+  if(flagged.length){
+   set('PERLU DIWASPADAI · '+flagged.length+'/'+matched.length+' TITIK','TERINDIKASI JALAN KECIL / PERMUKAAN NONASPAL',unique.join(' · ')||'Tag jalan perlu diverifikasi');
+   if(!NAV.roadWarned){NAV.roadWarned=true;toast('Peringatan: data peta menandai sebagian jalur sebagai jalan kecil atau permukaan nonaspal. Periksa peta sebelum mengikuti rute.','warn')}
+  }else if(knownSurface.length){
+   const paved=knownSurface.filter(t=>['asphalt','paved','concrete','concrete:lanes','paving_stones','sett'].includes(t.surface));
+   set('TIDAK ADA INDIKASI JALAN TERLARANG','ASPAL / PERMUKAAN KERAS TERPETAKAN '+paved.length+'/'+knownSurface.length,'OSM · '+new Date().toLocaleTimeString('id-ID'));
+  }else{
+   set('KLASIFIKASI JALAN TERSEDIA','PERMUKAAN BELUM DICATAT','OSM · '+new Date().toLocaleTimeString('id-ID'));
+  }
+ }catch(e){
+  set('PEMERIKSAAN GAGAL','KONDISI JALAN TIDAK DIKETAHUI','CEK INTERNET · '+new Date().toLocaleTimeString('id-ID'));
+ }
+}
+
+const MOD={'left':'kiri','right':'kanan','slight left':'serong kiri','slight right':'serong kanan','sharp left':'tajam ke kiri','sharp right':'tajam ke kanan','straight':'lurus','uturn':'putar balik'};
+const ARW={'left':'↰','right':'↱','slight left':'↖','slight right':'↗','sharp left':'↙','sharp right':'↘','straight':'↑','uturn':'↶'};
+function stepText(s){
+ const m=s.maneuver||{},t=m.type||'continue',mod=MOD[m.modifier]||'',road=s.name?' ke '+s.name:'';
+ if(t==='arrive')return 'Tiba di tujuan';if(t==='depart')return 'Mulai perjalanan'+(s.name?' di '+s.name:'');
+ if(m.modifier==='uturn')return 'Putar balik'+road;
+ if(/roundabout|rotary/.test(t))return 'Masuk bundaran'+(m.exit?', ambil jalan ke-'+m.exit:'')+road;
+ if(t==='merge')return 'Bergabung'+(mod?' ke '+mod:'')+road;
+ if(t==='fork')return 'Ambil percabangan '+(mod||'lurus')+road;
+ if(['turn','end of road','on ramp','off ramp','ramp'].includes(t))return 'Belok '+(mod||'')+road;
+ return 'Lanjut '+(mod||'lurus')+road;
+}
+const stepArrow=s=>{const m=s.maneuver||{};return m.type==='arrive'?'⚑':m.type==='depart'?'▶':(ARW[m.modifier]||'↑')};
+function approxM(lat1,lon1,lat2,lon2){const dx=(lon2-lon1)*Math.cos(lat1*Math.PI/180)*111320,dy=(lat2-lat1)*110540;return Math.sqrt(dx*dx+dy*dy)}
+function pinIcon(c,cls){return L.divIcon({className:'',html:'<div class="pin '+(cls||'')+'"><span>'+(c||'')+'</span></div>',iconSize:[26,26],iconAnchor:[13,26]})}
+function renderWpList(){
+ const b=$('wpList');b.innerHTML=NAV.waypoints.map((w,i)=>'<span class="wpchip">'+(i+1)+'. '+esc(w.name)+'<button type="button" data-rmwp="'+i+'">✕</button></span>').join('');
+ NAV.wpMarkers.forEach(m=>NAV.map&&NAV.map.removeLayer(m));NAV.wpMarkers=[];
+ if(NAV.map)NAV.waypoints.forEach((w,i)=>NAV.wpMarkers.push(L.marker([w.lat,w.lon],{icon:pinIcon(i+1,'wp')}).addTo(NAV.map).bindPopup('SINGGAH: '+w.display)));
+}
+on('wpList','click',e=>{const b=e.target.closest('[data-rmwp]');if(!b)return;NAV.waypoints.splice(Number(b.dataset.rmwp),1);renderWpList();if(NAV.route)buildRoute({})});
+async function buildRoute(opts){
+ opts=opts||{};const q=$('destination').value.trim();
+ if(!q&&!NAV.destInfo){txt('navInstruction','Masukkan tujuan terlebih dahulu');return false}
+ if(NAV.busy)return false;NAV.busy=true;
+ txt('navInstruction',opts.reroute?'Menghitung ulang rute…':'Menyiapkan peta, mencari tujuan, dan mengunci GPS…');txt('navDistanceNext','Menghubungi layanan pencarian dan rute…');txt('mapLinkStatus','CONNECTING…');
+ $('searchMap').disabled=true;$('openMaps').disabled=true;
+ try{
+  await ensureLeaflet();initMap();
+  let dest=NAV.destInfo;if(!dest||(q&&NAV.destQuery!==q)){dest=await geocode(q);NAV.destInfo=dest;NAV.destQuery=q}
+  const pos=await getPos();
+  if(!opts.reroute)NAV.pending=NAV.waypoints.slice();
+  const pts=[pos,...NAV.pending,dest],coords=pts.map(p=>p.lon.toFixed(6)+','+p.lat.toFixed(6)).join(';');
+  const route=await getRoute(coords);
+  if(!route.geometry||!route.geometry.coordinates.length)throw new Error('Mesin rute tidak mengembalikan jalur valid.');
+  applyRoute(route,dest,pos,opts);return true;
+ }catch(e){
+  txt('navInstruction','GAGAL MEMUAT RUTE');txt('navDistanceNext',e.message);txt('mapLinkStatus','RETRY AVAILABLE');txt('mapOrientationStatus','RETRY');toast(e.message,'err');return false;
+ }finally{NAV.busy=false;$('searchMap').disabled=false;$('openMaps').disabled=false}
+}
+function applyRoute(route,dest,pos,opts){
+ if(!NAV.map||!validPoint(dest)||!validPoint(pos))throw new Error('Koordinat awal, tujuan, atau peta tidak valid. Aktifkan GPS dan cari tujuan kembali.');
+ const rawLine=route&&route.geometry&&route.geometry.coordinates;
+ if(!Array.isArray(rawLine)||rawLine.length<2||rawLine.some(c=>!Array.isArray(c)||c.length<2||!Number.isFinite(Number(c[0]))||!Number.isFinite(Number(c[1]))||Math.abs(Number(c[0]))>180||Math.abs(Number(c[1]))>90))throw new Error('Data geometri rute tidak valid dari server. Coba cari rute kembali.');
+ NAV.map.invalidateSize({pan:false});
+ NAV.route=route;NAV.steps=(route.legs||[]).flatMap(l=>l.steps||[]);NAV.idx=0;NAV.off=0;NAV.curStep=-1;if(!opts.reroute)NAV.announced.clear();
+ const ln=rawLine;NAV.cum=new Array(ln.length);NAV.cum[0]=0;
+ for(let i=1;i<ln.length;i++)NAV.cum[i]=NAV.cum[i-1]+approxM(ln[i-1][1],ln[i-1][0],ln[i][1],ln[i][0]);
+ NAV.total=NAV.cum[ln.length-1]||route.distance||1;
+ let from=0;
+ NAV.steps.forEach(s=>{const loc=(s.maneuver||{}).location;if(!loc){s.at=from?NAV.cum[from]:0;return}let best=1e18,bi=from;for(let i=from;i<ln.length;i++){const d=approxM(loc[1],loc[0],ln[i][1],ln[i][0]);if(d<best){best=d;bi=i}}from=bi;s.at=NAV.cum[bi]});
+ if(NAV.routeLayer&&NAV.map.hasLayer(NAV.routeLayer))NAV.map.removeLayer(NAV.routeLayer);
+ if(NAV.casing&&NAV.map.hasLayer(NAV.casing))NAV.map.removeLayer(NAV.casing);
+ NAV.casing=L.geoJSON(route.geometry,{style:{color:'#031018',weight:11,opacity:.85}}).addTo(NAV.map);
+ NAV.routeLayer=L.geoJSON(route.geometry,{style:{color:css('--neon'),weight:6,opacity:.95}}).addTo(NAV.map);
+ if(NAV.destMarker)NAV.map.removeLayer(NAV.destMarker);
+ NAV.destMarker=L.marker([dest.lat,dest.lon],{icon:pinIcon('⚑'),zIndexOffset:1100,pane:'markerPane'}).addTo(NAV.map).bindPopup('TUJUAN: '+dest.display);if(NAV.destMarker.bringToFront)NAV.destMarker.bringToFront();renderWpList();
+ NAV.user.setLatLng([pos.lat,pos.lon]);
+ if(!opts.reroute||!NAV.active){const b=NAV.routeLayer.getBounds();if(b&&b.isValid())NAV.map.fitBounds(b,{padding:[35,35],maxZoom:17})}
+ const dur=Number(route.duration)||NAV.total/35*3.6;
+ txt('navRemaining',fmtM(NAV.total));txt('navEta',etaText(dur));
+ txt('navDistanceNext',(route._fallback?'Rute cadangan '+route._fallback+' · ':'Rute kendaraan · jarak/waktu seimbang · ')+fmtM(NAV.total)+(NAV.pending.length?' · '+NAV.pending.length+' singgah':''));
+ txt('navInstruction',opts.reroute?'RUTE BARU SIAP':'RUTE SIAP · '+(dest.name||''));txt('navArrow','⌖');
+ $('navStepList').innerHTML=NAV.steps.length?NAV.steps.map((s,i)=>'<div class="step" data-i="'+i+'"><b>'+fmtM(s.distance||0)+'</b><span>'+esc(stepText(s))+'</span></div>').join(''):'<div class="step"><b>RUTE</b><span>Ikuti jalur pada peta. Instruksi belokan tidak tersedia dari server cadangan.</span></div>';
+ txt('mapLinkStatus','ROUTE READY');txt('mapOrientationStatus',NAV.active?'NAVIGATING':'ROUTE READY');txt('mapGpsFix',Math.round(pos.acc||0)+'M');
+ NAV.map.invalidateSize(true);if(NAV.user&&NAV.user.bringToFront)NAV.user.bringToFront();if(NAV.destMarker&&NAV.destMarker.bringToFront)NAV.destMarker.bringToFront();log('Rute: '+fmtM(NAV.total)+' ke '+(dest.name||'tujuan'));
+}
+function etaText(sec){const m=Math.max(1,Math.round(sec/60)),arr=new Date(Date.now()+sec*1000);return(m>=60?Math.floor(m/60)+' j '+(m%60)+' m':m+' mnt')+' · '+pad(arr.getHours())+':'+pad(arr.getMinutes())}
+function navOnFix(f){
+ if(NAV.map&&NAV.user){NAV.user.setLatLng([f.lat,f.lon]);NAV.acc.setLatLng([f.lat,f.lon]);NAV.acc.setRadius(Math.min(f.acc,200));if(NAV.active&&cfg.follow&&S.page==='maps')NAV.map.panTo([f.lat,f.lon],{animate:true,duration:.6})}
+ if(NAV.active&&NAV.route)navProgress(f);
+}
+function navProgress(f){
+ const ln=NAV.route.geometry.coordinates,n=ln.length;let best=1e18,bi=NAV.idx;
+ const scan=(a,b)=>{for(let i=a;i<b;i++){const d=approxM(f.lat,f.lon,ln[i][1],ln[i][0]);if(d<best){best=d;bi=i}}};
+ scan(Math.max(0,NAV.idx-15),Math.min(n,NAV.idx+500));if(best>120){best=1e18;scan(0,n)}
+ NAV.idx=bi;const along=NAV.cum[bi],remain=Math.max(0,NAV.total-along);
+ if(best>70&&f.acc<60)NAV.off++;else NAV.off=0;
+ if(NAV.off>=3&&Date.now()-NAV.lastReroute>20000){NAV.lastReroute=Date.now();NAV.off=0;toast('Keluar jalur — menghitung ulang rute…','warn');speak('Menghitung ulang rute');buildRoute({reroute:true});return}
+ NAV.pending=NAV.pending.filter(w=>approxM(f.lat,f.lon,w.lat,w.lon)>60||(toast('Titik singgah tercapai: '+w.name),false));
+ let k=NAV.steps.findIndex(s=>s.at>along+12);if(k<0)k=NAV.steps.length-1;
+ const st=NAV.steps[k];
+ if(st){
+  const dn=Math.max(0,st.at-along);txt('navInstruction',stepText(st));txt('navArrow',stepArrow(st));txt('navDistanceNext','Dalam '+fmtM(dn)+' · langkah '+(k+1)+'/'+NAV.steps.length);
+  if(k!==NAV.curStep){NAV.curStep=k;document.querySelectorAll('#navStepList .step').forEach(e=>e.classList.toggle('cur',Number(e.dataset.i)===k));const cur=document.querySelector('#navStepList .step.cur');if(cur)cur.parentNode.scrollTop=cur.offsetTop-cur.parentNode.offsetTop-6}
+  if(dn<=250&&!NAV.announced.has(k)){NAV.announced.add(k);speak((dn>40?'Dalam '+Math.max(10,Math.round(dn/10)*10)+' meter, ':'')+stepText(st))}
+ }else{txt('navInstruction','Ikuti jalur pada peta');txt('navArrow','↑')}
+ txt('navRemaining',fmtM(remain));
+ const rt=NAV.route.duration*(remain/Math.max(1,NAV.route.distance));txt('navEta',etaText(S.speed>10?(remain/(S.speed/3.6))*.5+rt*.5:rt));
+ if(remain<30&&along>10){txt('navInstruction','Anda telah tiba di tujuan');txt('navDistanceNext','Navigasi selesai');txt('navArrow','⚑');speak('Anda telah tiba di tujuan');stopNav(true)}
+}
+function stopNav(arrived){
+ NAV.active=false;GPS.stop('nav');try{'speechSynthesis' in window&&speechSynthesis.cancel()}catch(e){}
+ if(!arrived){txt('navInstruction','Navigasi dihentikan');txt('navDistanceNext','Rute masih tersimpan di peta')}
+ txt('mapLinkStatus','STOPPED');txt('mapOrientationStatus','STANDBY');log('Navigasi berhenti');
+}
+async function searchRoute(){audioUnlock();NAV.destInfo=null;const ok=await buildRoute({});if(ok&&S.page!=='maps')go('maps')}
+on('searchMap','click',searchRoute);on('destination','keydown',e=>{if(e.key==='Enter')searchRoute()});
+on('openMaps','click',async()=>{
+ audioUnlock();if(!NAV.route){NAV.destInfo=null;if(!(await buildRoute({})))return}
+ if(!GPS.start('nav'))return;NAV.active=true;NAV.announced.clear();NAV.curStep=-1;
+ speak('Navigasi dimulai. Ikuti petunjuk pada layar.');txt('mapLinkStatus','GUIDANCE ACTIVE');txt('mapOrientationStatus','NAVIGATING');
+ if(S.fix){NAV.map.setView([S.fix.lat,S.fix.lon],17)}log('Navigasi aktif');
+});
+on('stopNavigation','click',()=>stopNav(false));
+on('myLocation','click',async()=>{try{await ensureLeaflet();initMap();const p=await getPos();NAV.user.setLatLng([p.lat,p.lon]);NAV.acc.setLatLng([p.lat,p.lon]);NAV.acc.setRadius(Math.min(p.acc||0,200));NAV.map.setView([p.lat,p.lon],17);txt('mapGpsFix','OK · '+Math.round(p.acc||0)+'M')}catch(e){toast('Lokasi tidak dapat diakses: '+e.message,'err')}});
+on('addWaypoint','click',async()=>{const q=$('waypoint').value.trim();if(!q)return;try{await ensureLeaflet();initMap();const p=await geocode(q);NAV.waypoints.push(p);$('waypoint').value='';renderWpList();toast('Titik singgah ditambahkan: '+p.name);if($('destination').value.trim())await buildRoute({})}catch(e){toast(e.message,'err')}});
+on('waypoint','keydown',e=>{if(e.key==='Enter')$('addWaypoint').click()});
+on('followBtn','click',()=>setCfg('follow',!cfg.follow));on('voiceBtn','click',()=>{setCfg('voice',!cfg.voice);if(cfg.voice)speak('Panduan suara aktif')});
+on('tileBtn','click',async()=>{try{await ensureLeaflet();initMap();setTile(NAV.tileKind==='dark'?'osm':'dark')}catch(e){toast(e.message,'err')}});
+
+/* ========== display control ========== */
+let reqOri='auto';
+function setOri(mode){
+ reqOri=mode;document.querySelectorAll('.orient button').forEach(b=>b.classList.remove('active'));$({auto:'autoOrientation',portrait:'portraitOrientation',landscape:'landscapeOrientation'}[mode]).classList.add('active');
+ const p=$('orientationPreview');p.classList.toggle('portrait',mode==='portrait');p.classList.toggle('landscape',mode==='landscape');
+ p.textContent=mode==='auto'?'Mode otomatis mengikuti orientasi perangkat':mode==='portrait'?'Mode berdiri · Portrait dipilih':'Mode miring · Landscape dipilih';
+ txt('orientationStatus',mode==='auto'?'Mode otomatis aktif.':'Mode '+mode+' dipilih. Tekan "Terapkan orientasi" untuk mengunci rotasi.');
+}
+on('autoOrientation','click',()=>setOri('auto'));on('portraitOrientation','click',()=>setOri('portrait'));on('landscapeOrientation','click',()=>setOri('landscape'));
+on('applyOrientation','click',async()=>{
+ if(reqOri==='auto'){try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch(e){}txt('orientationStatus','Kunci orientasi dilepas.');return}
+ try{if(!(screen.orientation&&screen.orientation.lock))throw new Error('API kunci orientasi tidak didukung browser ini.');if(!document.fullscreenElement&&document.documentElement.requestFullscreen){try{await document.documentElement.requestFullscreen()}catch(e){}}await screen.orientation.lock(reqOri);txt('orientationStatus','Orientasi '+reqOri+' berhasil dikunci.')}
+ catch(e){txt('orientationStatus','Belum dapat mengunci orientasi: '+e.message+' Coba layar penuh atau gunakan aplikasi Android pendamping.')}
+});
+on('fullscreenBtn','click',async()=>{try{if(!document.fullscreenElement)await enterFs(null);else await exitFs()}catch(e){txt('orientationStatus','Layar penuh tidak tersedia: '+e.message)}});
+on('wakeBtn','click',()=>{if(!('wakeLock' in navigator)){toast('Wake Lock tidak didukung browser ini','warn');return}setCfg('wake',!cfg.wake);toast(cfg.wake?'Layar tetap menyala':'Layar boleh mati')});
+const oriUpd=()=>{txt('orientInfo',(screen.orientation&&screen.orientation.type)||(innerWidth>innerHeight?'landscape':'portrait'));txt('viewInfo',innerWidth+'×'+innerHeight);txt('mapOrientationStatus',NAV.active?'NAVIGATING':(NAV.route?'ROUTE READY':'WAITING'))};
+addEventListener('orientationchange',()=>{oriUpd();setTimeout(()=>NAV.map&&NAV.map.invalidateSize(),350)});if(screen.orientation)screen.orientation.addEventListener('change',oriUpd);oriUpd();
+
+/* ========== mirror ========== */
+let shareStream=null;
+on('startShare','click',async()=>{
+ if(!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)){toast('Screen capture tidak didukung browser ini (butuh HTTPS & browser kompatibel)','err');return}
+ try{shareStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});$('screenPreview').srcObject=shareStream;txt('mirrorStatus','Screen share: aktif (pratinjau lokal)');setDot('mirrorDot',true);$('stopShare').disabled=false;shareStream.getVideoTracks()[0].addEventListener('ended',stopShare)}
+ catch(e){txt('mirrorStatus','Screen share: tidak dimulai');toast('Screen share gagal: '+e.message,'err')}
+});
+function stopShare(){if(shareStream){shareStream.getTracks().forEach(t=>t.stop());shareStream=null}$('screenPreview').srcObject=null;txt('mirrorStatus','Screen share: berhenti');setDot('mirrorDot',false);$('stopShare').disabled=true}
+on('stopShare','click',stopShare);
+on('receiverFullscreen','click',()=>enterFs($('page-mirror')));
+on('checkReceiver','click',()=>{
+ const bt=!!navigator.bluetooth,sec=window.isSecureContext;
+ txt('receiverBluetooth',bt?'API TERSEDIA':'TIDAK DIDUKUNG');txt('receiverNotif','BUTUH ANDROID COMPANION');txt('receiverLinkMode','MENUNGGU APK');txt('receiverRelay','BELUM ADA RELAY');
+ txt('receiverState',(sec?'HTTPS AKTIF':'HTTPS DIPERLUKAN')+' · APK PENDAMPING BELUM TERHUBUNG');
+ $('receiverFeed').innerHTML='PAIRING BELUM AKTIF — Web Bluetooth: '+(bt?'ya':'tidak')+' · Secure context: '+(sec?'ya':'tidak')+'. Notifikasi HP pertama memerlukan aplikasi Android pendamping. <span id="receiverClock"></span>';
+});
+txt('receiverBluetooth',navigator.bluetooth?'API TERSEDIA':'TIDAK DIDUKUNG');
+
+/* ========== music ========== */
+function ytEmbed(v){
+ v=v.trim();if(/^[\w-]{11}$/.test(v))return 'https://www.youtube-nocookie.com/embed/'+v+'?autoplay=1&rel=0';
+ try{const u=new URL(v),list=u.searchParams.get('list');let id=null;
+  if(u.hostname.includes('youtu.be'))id=u.pathname.slice(1,12);else if(u.hostname.includes('youtube.com'))id=u.searchParams.get('v')||(u.pathname.split('/').filter(Boolean).pop()||'').slice(0,11);
+  if(id&&/^[\w-]{11}$/.test(id))return 'https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0'+(list?'&list='+encodeURIComponent(list):'');
+  if(list)return 'https://www.youtube-nocookie.com/embed/videoseries?list='+encodeURIComponent(list)+'&autoplay=1';
+ }catch(e){}return null;
+}
+function loadYt(auto){const src=ytEmbed($('youtubeInput').value);if(!src){if(!auto)toast('Masukkan URL YouTube atau ID video yang valid','warn');return}$('youtubePlayer').src=auto?src.replace('autoplay=1','autoplay=0'):src;store.set('navixu3_yt',$('youtubeInput').value.trim())}
+on('loadYoutube','click',()=>loadYt(false));on('youtubeInput','keydown',e=>{if(e.key==='Enter')loadYt(false)});
+on('openYoutube','click',()=>window.open('https://music.youtube.com/','_blank','noopener'));
+{const y=store.get('navixu3_yt','');if(y){$('youtubeInput').value=y}}
+
+/* ========== device link & diagnostics ========== */
+async function pingNet(){
+ const t0=performance.now();txt('netPing','…');
+ try{await fetchT('https://www.gstatic.com/generate_204',8000,{mode:'no-cors',cache:'no-store'});const ms=Math.round(performance.now()-t0);txt('netPing',ms+' ms');return ms}
+ catch(e){txt('netPing','GAGAL');return null}
+}
+on('checkNetwork','click',async()=>{network();const ms=await pingNet();toast(navigator.onLine?(ms!==null?'Internet OK · '+ms+' ms':'Browser online, tetapi server uji tidak terjangkau'):'Perangkat sedang offline',ms!==null?'':'warn')});
+on('bluetoothBtn','click',async()=>{
+ if(!navigator.bluetooth){toast('Web Bluetooth tidak tersedia (butuh Chrome/Edge, HTTPS, perangkat GATT)','err');return}
+ try{const d=await navigator.bluetooth.requestDevice({acceptAllDevices:true});txt('btResult',(d.name||'Perangkat tanpa nama').toUpperCase());toast('Perangkat dipilih: '+(d.name||d.id)+'. Koneksi layanan butuh profil GATT yang didukung.')}catch(e){if(e.name!=='NotFoundError')toast('Bluetooth: '+e.message,'err')}
+});
+async function runDiag(){
+ const rows=[];const add=(n,ok,d)=>rows.push([n,ok,d]);
+ add('HTTPS / secure context',window.isSecureContext,window.isSecureContext?'GPS & fitur lanjutan diizinkan':'GPS butuh HTTPS atau localhost');
+ add('Geolocation API',!!navigator.geolocation,'');
+ let perm='tidak diketahui';try{if(navigator.permissions){perm=(await navigator.permissions.query({name:'geolocation'})).state}}catch(e){}
+ add('Izin lokasi',perm==='granted'?true:perm==='denied'?false:'warn',perm);
+ add('Notifikasi','Notification' in window?(Notification.permission==='granted'?true:'warn'):false,'Notification' in window?Notification.permission:'tidak didukung');
+ add('Getar',!!navigator.vibrate,navigator.vibrate?'tersedia':'tidak didukung (umum di desktop/iOS)');
+ add('Suara navigasi','speechSynthesis' in window,'');add('Audio alarm (WebAudio)',!!(window.AudioContext||window.webkitAudioContext),'');
+ add('Wake Lock','wakeLock' in navigator,'');add('Layar penuh',!!document.documentElement.requestFullscreen,'');
+ add('Web Bluetooth',!!navigator.bluetooth,'');add('Screen capture',!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia),'');
+ add('API baterai',!!navigator.getBattery,S.bat?Math.round(S.bat.level*100)+'%':'');
+ let ls=false;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');ls=true}catch(e){}
+ add('Penyimpanan lokal',ls,ls?'riwayat & pengaturan dapat disimpan':'diblokir — data tidak tersimpan');
+ add('Sensor kompas',typeof DeviceOrientationEvent!=='undefined','');
+ $('diagList').innerHTML=rows.map(r=>'<div><span class="dot '+(r[1]===true?'ok':r[1]==='warn'?'warn':'bad')+'" style="margin-top:6px"></span><span><b>'+esc(r[0])+'</b><small>'+esc(r[2]||(r[1]===true?'OK':'Tidak tersedia'))+'</small></span></div>').join('');
+ pingNet();
+}
+on('runDiag','click',runDiag);
+
+/* ========== whatsapp ========== */
+let waLoaded=false,waFrameOk=false,waFrameAt=0,waTimer=null;
+const waFrame=$('whatsappFrame'),waOv=$('waOverlay');
+function waStart(){waOv.classList.remove('hidden');txt('waStatus','MENGHUBUNGKAN…');clearTimeout(waTimer);waTimer=setTimeout(()=>{txt('waStatus','CEK KOMPATIBILITAS');waOv.querySelector('strong').textContent='MENUNGGU WHATSAPP WEB';waOv.querySelector('span').textContent='Jika layar kosong, layanan menolak iframe. Gunakan tab cadangan.'},12000)}
+function waLoad(){if(waLoaded)return;waLoaded=true;waStart();waFrame.src='https://web.whatsapp.com/'}
+waFrame.addEventListener('load',()=>{if(!waFrame.getAttribute('src'))return;waFrameOk=true;waFrameAt=Date.now();clearTimeout(waTimer);txt('waStatus','HALAMAN MERESPONS');waOv.querySelector('strong').textContent='WHATSAPP WEB DIMUAT';waOv.querySelector('span').textContent='Jika login tidak terlihat, kemungkinan ada pembatasan iframe.';setTimeout(()=>waOv.classList.add('hidden'),1800);waSet('waFrameState','RESPONS','Event load diterima; login belum terverifikasi');waLog('Iframe mengirim event load (bukan bukti login).')});
+function waReload(){waFrameOk=false;waFrameAt=0;waLoaded=true;waStart();waFrame.src='https://web.whatsapp.com/?navixu3='+Date.now()}
+on('waReload','click',waReload);on('waOpenTab','click',()=>window.open('https://web.whatsapp.com/','_blank','noopener,noreferrer'));
+const waMsgs=$('waDoctorMessages'),waLogBox=$('waDiagnosticLog');
+function waSet(id,v,d){txt(id,v);const e=$(id.replace('State','Detail'));if(e&&d)e.textContent=d}
+function waLog(m){waLogBox.textContent=(waLogBox.textContent.startsWith('[BOOT]')?'':waLogBox.textContent+'\n')+'['+new Date().toLocaleTimeString('id-ID',{hour12:false})+'] '+m;waLogBox.scrollTop=waLogBox.scrollHeight}
+function waMsg(type,title,body){const el=document.createElement('div');el.className='dmsg '+type;const b=document.createElement('b');b.textContent=title;const p=document.createElement('p');p.innerHTML=body;const t=document.createElement('time');t.textContent=new Date().toLocaleTimeString('id-ID',{hour12:false});el.append(b,p,t);waMsgs.appendChild(el);waMsgs.scrollTop=waMsgs.scrollHeight}
+function waDiagnose(speak){
+ const online=navigator.onLine,okB=!!(window.fetch&&window.Promise);
+ waSet('waNetState',online?'ONLINE':'OFFLINE',online?'Browser melaporkan koneksi aktif':'Perangkat offline');waSet('waBrowserState',okB?'DIDUKUNG':'TERBATAS',okB?'Fitur dasar tersedia':'Sebagian fitur tidak ada');
+ if(waFrameOk)waSet('waFrameState','RESPONS','Load '+Math.round((Date.now()-waFrameAt)/1000)+' dtk lalu; isi tidak dapat dibaca lintas domain');else waSet('waFrameState',waLoaded?'BELUM TERKONFIRMASI':'BELUM DIMUAT',waLoaded?'Tidak ada event load':'Panel dimuat saat modul dibuka');
+ txt('waLastCheck',new Date().toLocaleTimeString('id-ID',{hour12:false}));waLog('Cek: internet '+(online?'ONLINE':'OFFLINE')+'; iframe '+(waFrameOk?'LOAD':'BELUM'));
+ if(!speak)return;let c;
+ if(!online)c='Perangkat terdeteksi offline. Periksa Wi-Fi atau data seluler lalu ulangi diagnosis.';
+ else if(!waFrameOk)c='Internet aktif, tetapi panel belum mengirim event load. Kemungkinan WhatsApp memblokir iframe pihak ketiga, jaringan memfilter domain, atau halaman belum selesai. Coba BUKA WHATSAPP RESMI.';
+ else c='Browser menerima event load, tetapi naviXU3 tidak bisa membaca isi WhatsApp (batas keamanan lintas domain). Jika QR tidak terlihat, gunakan tab resmi.';
+ waMsg('bot','HASIL DIAGNOSIS',esc(c)+'<br><br>Langkah aman: perbarui browser, pastikan tanggal/waktu benar, izinkan cookie, login hanya di <b>web.whatsapp.com</b>. Jangan bagikan QR atau OTP.');
+}
+function waAnswer(q){
+ const s=q.toLowerCase();let a;
+ if(/kosong|blank|putih|hitam/.test(s))a='Panel kosong biasanya karena WhatsApp melarang situs lain menampilkannya di iframe. Coba <b>BUKA WHATSAPP RESMI</b>; tab naviXU3 tetap terbuka.';
+ else if(/qr|kode|scan/.test(s))a='QR hanya ditampilkan WhatsApp di halaman resminya. Muat ulang halaman resmi lalu ikuti petunjuk tautkan perangkat. Jangan kirim gambar QR atau OTP ke siapa pun.';
+ else if(/memuat|loading|terhubung|connect/.test(s))a='Memuat terus bisa karena koneksi tidak stabil, browser lama, cookie dibatasi, atau iframe diblokir. Jalankan diagnosis lalu coba tab resmi.';
+ else if(/aman|hubungkan|login/.test(s))a='Buka WhatsApp Web resmi lewat tombol tersedia, login dengan metode yang ditampilkan WhatsApp. Pastikan alamat <b>web.whatsapp.com</b>.';
+ else a='Saya memeriksa panel dan browser saja, tanpa akses ke akun WhatsApp. Tekan <b>JALANKAN DIAGNOSIS</b> lalu ceritakan kendalanya.';
+ waMsg('bot','WA DOCTOR',a);
+}
+on('waRunDiagnosis','click',()=>waDiagnose(true));on('waTryReconnect','click',()=>{waReload();waLog('Muat ulang diminta.');waMsg('bot','RECONNECT','Panel dimuat ulang. Bila tetap tidak tampil, gunakan halaman resmi di tab cadangan.')});
+on('waOpenOfficial','click',()=>window.open('https://web.whatsapp.com/','_blank','noopener,noreferrer'));
+on('waDoctorForm','submit',e=>{e.preventDefault();const i=$('waDoctorInput'),q=i.value.trim();if(!q)return;waMsg('user','ANDA',esc(q));i.value='';waAnswer(q)});
+document.querySelectorAll('[data-wa-question]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.waQuestion;waMsg('user','ANDA',esc(q));waAnswer(q)}));
+on('waClearChat','click',()=>{waMsgs.innerHTML='';waMsg('bot','WA DOCTOR','Riwayat dibersihkan. Jalankan diagnosis untuk pemeriksaan baru.');waLog('Chat dibersihkan.')});
+addEventListener('online',()=>{waDiagnose(false)});addEventListener('offline',()=>{waDiagnose(false);waMsg('bot','PERINGATAN','Perangkat terdeteksi offline.')});
+setInterval(()=>{if(S.page==='whatsapp')waDiagnose(false)},10000);
+
+/* ========== settings buttons ========== */
+on('resetCfg','click',()=>{if(!confirm('Kembalikan semua pengaturan ke bawaan?'))return;cfg=Object.assign({},DEF);saveCfg();applyCfg();toast('Pengaturan direset')});
+on('wipeData','click',()=>{if(!confirm('Hapus SEMUA data naviXU3 (pengaturan, riwayat, sesi) di perangkat ini?'))return;Object.keys(localStorage).filter(k=>k.startsWith('navixu3')).forEach(k=>store.del(k));Object.assign(T,{dist:0,max:0,elapsed:0,moving:0,series:[],lastS:-1});cfg=Object.assign({},DEF);applyCfg();renderHistory();toast('Semua data dihapus')});
+
+
+/* ========== NAVIXU3 LOCATION INTELLIGENCE UPGRADE ========== */
+const LOC={lastReverse:0,lastRevKey:'',reverseBusy:false,suggestTimer:0,suggestAbort:null,history:[],favorites:[],heading:null};
+const LOC_HIST='navixu3_location_history_v1',LOC_FAV='navixu3_location_favorites_v1';
+try{LOC.history=JSON.parse(localStorage.getItem(LOC_HIST)||'[]');LOC.favorites=JSON.parse(localStorage.getItem(LOC_FAV)||'[]')}catch(e){}
+const locSet=(id,v)=>{const e=$(id);if(e)e.textContent=v||'Data tidak tersedia'};
+const locCopy=async(v)=>{try{await navigator.clipboard.writeText(v);toast('Berhasil disalin')}catch(e){toast('Clipboard tidak tersedia. Salin manual: '+v,'warn')}};
+function locAddr(a,k){return a&&a[k]?a[k]:'Data tidak tersedia'}
+function renderLocationLists(){
+ const f=$('favoriteLocations'),h=$('locationHistory');if(!f||!h)return;
+ f.innerHTML=LOC.favorites.length?LOC.favorites.map((x,i)=>'<div class="loc-item"><span><b>'+esc(x.name)+'</b><br><small>'+esc(x.address||x.lat+', '+x.lon)+'</small></span><span><button data-fav-go="'+i+'">BUKA</button><button data-fav-del="'+i+'">✕</button></span></div>').join(''):'<div class="empty">Belum ada lokasi favorit.</div>';
+ h.innerHTML=LOC.history.length?LOC.history.slice(0,8).map((x,i)=>'<div class="loc-item"><span><b>'+esc(x.name)+'</b><br><small>'+esc(x.address||x.lat+', '+x.lon)+'</small></span><button data-hist-go="'+i+'">BUKA</button></div>').join(''):'<div class="empty">Belum ada pencarian.</div>';
+}
+function pushLocHistory(x){LOC.history=[x,...LOC.history.filter(y=>y.name!==x.name)].slice(0,20);try{localStorage.setItem(LOC_HIST,JSON.stringify(LOC.history))}catch(e){}renderLocationLists()}
+function renderAddress(j){
+ const a=j&&j.address||{};
+ locSet('addrRoad',[a.road,a.pedestrian,a.path,a.residential,a.neighbourhood].find(Boolean));
+ locSet('addrHamlet',[a.hamlet,a.suburb,a.quarter,a.neighbourhood].find(Boolean));
+ locSet('addrRtRw',[a.residential,a.house_number,a.locality].filter(Boolean).join(' / ')||'Tidak disediakan data peta');
+ locSet('addrVillage',[a.village,a.township,a.city_district,a.suburb].find(Boolean));
+ locSet('addrDistrict',a.city_district||a.district||a.county_district||a.municipality);
+ locSet('addrCounty',a.county||a.city||a.municipality);
+ locSet('addrProvince',a.state||a.region);
+ locSet('addrPostcode',a.postcode);
+ locSet('addrCountry',a.country);
+ locSet('addrFull',j&&j.display_name?'Alamat: '+j.display_name:'Alamat lengkap tidak tersedia dari penyedia geocoding.');
+}
+async function reverseLocation(f,force){
+ if(!f||!navigator.onLine||!window.isSecureContext)return;
+ const key=f.lat.toFixed(4)+','+f.lon.toFixed(4);
+ if(LOC.reverseBusy||(!force&&key===LOC.lastRevKey&&Date.now()-LOC.lastReverse<90000))return;
+ LOC.reverseBusy=true;LOC.lastReverse=Date.now();LOC.lastRevKey=key;
+ try{
+  const r=await fetchT('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(f.lat)+'&lon='+encodeURIComponent(f.lon)+'&zoom=18&addressdetails=1',14000,{headers:{'Accept-Language':'id,en'}});
+  if(!r.ok)throw new Error('Geocoding HTTP '+r.status);
+  const j=await r.json();renderAddress(j);locSet('gpsOnlyAddress',j.display_name||'Alamat tidak tersedia dari peta');
+  const a=j.address||{};const village=a.village||a.township||a.suburb||a.city_district||'Data tidak tersedia';
+  locSet('locSignal',f.acc<=15?'GPS AKURAT':f.acc<=50?'GPS CUKUP':'GPS LEMAH');
+  $('locSignal').style.color=f.acc<=30?'var(--acid)':'var(--warn)';
+  log('Reverse geocoding diperbarui: '+village);
+ }catch(e){locSet('addrFull','Gagal memuat alamat: '+e.message+'. Koordinat GPS tetap tersedia.')}
+ finally{LOC.reverseBusy=false}
+}
+function updateLocationIntel(f){
+ if(!f)return;
+ locSet('gpsOnlyCoords',f.lat.toFixed(5)+', '+f.lon.toFixed(5));
+ locSet('gpsOnlyAccuracy','Akurasi ±'+Math.round(f.acc)+' m · '+new Date(f.t).toLocaleTimeString('id-ID'));
+ locSet('gpsOnlySpeed',S.hasSpeed?Math.round(S.speed)+' km/j':'-- km/j');
+ locSet('locLat',f.lat.toFixed(6));locSet('locLon',f.lon.toFixed(6));locSet('locAcc',Math.round(f.acc)+' meter');
+ locSet('locHeading',f.hd!==null&&Number.isFinite(f.hd)?compassLabel(f.hd):$('heading').textContent||'Sensor belum tersedia');
+ locSet('locSource',f.acc<=10?'GPS SANGAT BAIK':f.acc<=25?'GPS BAIK':f.acc<=60?'GPS SEDANG':'GPS LEMAH');
+ locSet('locSignal',f.acc<=10?'HIGH PRECISION':f.acc<=25?'GPS FIX GOOD':f.acc<=60?'GPS FIX MODERATE':'GPS FIX LOW');
+ locSet('gpsOnlyAccuracy','Akurasi aktual ±'+Math.round(f.acc)+' meter · '+(f.acc<=10?'sangat baik':f.acc<=25?'baik':f.acc<=60?'sedang':'lemah')+' · '+new Date(f.t).toLocaleTimeString('id-ID'));
+ locSet('locUpdated',new Date(f.t).toLocaleTimeString('id-ID'));
+ if(f.acc<=100)reverseLocation(f,false);
+ locSet('gpsOnlySpeed',S.hasSpeed?Math.round(S.speed)+' km/j':'-- km/j');
+}
+function parseCoordinateQuery(q){
+ const m=q.trim().match(/^(-?\d{1,2}(?:\.\d+)?)\s*[,;]\s*(-?\d{1,3}(?:\.\d+)?)$/);
+ if(!m)return null;const lat=Number(m[1]),lon=Number(m[2]);
+ return Math.abs(lat)<=90&&Math.abs(lon)<=180?{lat,lon,name:'Koordinat '+lat.toFixed(5)+', '+lon.toFixed(5),display:lat+', '+lon}:null;
+}
+const baseGeocode=geocode;
+geocode=async function(q){const c=parseCoordinateQuery(q);if(c){pushLocHistory(c);return c}const r=await baseGeocode(q);pushLocHistory(r);return r};
+function ensureSuggestions(){
+ const row=$('destination')?.parentElement;if(!row||$('mapSuggestions'))return;
+ const box=document.createElement('div');box.id='mapSuggestions';box.hidden=true;row.appendChild(box);
+}
+ensureSuggestions();
+function showSuggestions(items){
+ ensureSuggestions();const box=$('mapSuggestions');if(!box)return;
+ box.innerHTML=items.map((x,i)=>'<button type="button" data-suggest="'+i+'">'+esc(x.label)+'</button>').join('');
+ box.hidden=!items.length;LOC.suggestItems=items;
+}
+function hideSuggestions(){const b=$('mapSuggestions');if(b)b.hidden=true}
+on('destination','input',e=>{
+ clearTimeout(LOC.suggestTimer);const q=e.target.value.trim();if(q.length<3){hideSuggestions();return}
+ LOC.suggestTimer=setTimeout(async()=>{
+  try{
+   const r=await fetchT('https://photon.komoot.io/api/?limit=6&lang=id&q='+encodeURIComponent(q+(q.toLowerCase().includes('indonesia')?'':', Indonesia')),10000);
+   if(!r.ok)throw new Error('Autocomplete unavailable');
+   const j=await r.json();showSuggestions((j.features||[]).map(ft=>{
+    const p=ft.properties||{},c=ft.geometry.coordinates;
+    return{lat:c[1],lon:c[0],name:p.name||q,label:[p.name,p.street,p.district,p.city||p.county,p.state,p.country].filter(Boolean).join(', '),display:[p.name,p.street,p.city||p.county,p.state].filter(Boolean).join(', ')}
+   }));
+  }catch(e){hideSuggestions()}
+ },350);
+});
+on('mapSuggestions','click',e=>{
+ const b=e.target.closest('[data-suggest]');if(!b)return;
+ const p=LOC.suggestItems[Number(b.dataset.suggest)];if(!p)return;
+ $('destination').value=p.label;NAV.destInfo=p;NAV.destQuery=$('destination').value;hideSuggestions();searchRoute();
+});
+on('destination','blur',()=>setTimeout(hideSuggestions,180));
+/* Real provider layers: imagery, topo, OSM and CARTO dark */
+setTile=function(kind){
+ if(!NAV.map)return;
+ if(kind==='auto')kind=cfg.theme==='light'?'osm':'dark';
+ if(NAV.tileLayer&&NAV.tileKind===kind)return;
+ if(NAV.tileLayer)NAV.map.removeLayer(NAV.tileLayer);
+ NAV.tileKind=kind;let lyr;
+ if(kind==='satellite')lyr=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'});
+ else if(kind==='terrain')lyr=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,subdomains:'abc',attribution:'&copy; OpenTopoMap'});
+ else if(kind==='dark')lyr=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'});
+ else lyr=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,subdomains:'abc',attribution:'&copy; OpenStreetMap contributors'});
+ let failed=false;lyr.on('tileerror',()=>{if(failed)return;failed=true;txt('mapLinkStatus','LAYER ERROR · PERIKSA INTERNET');});
+ lyr.addTo(NAV.map);NAV.tileLayer=lyr;
+};
+on('mapLayerSelect','change',e=>{try{ensureLeaflet().then(()=>{initMap();setTile(e.target.value)})}catch(err){toast(err.message,'err')}});
+on('mapCompass','click',()=>{if(!NAV.map)return;const h=S.fix&&S.fix.hd!==null?S.fix.hd:LOC.heading;if(Number.isFinite(h))NAV.map.setBearing?NAV.map.setBearing(h):toast('Kompas peta: arah '+compassLabel(h)+' (Leaflet tidak memutar peta otomatis)','warn');else toast('Sensor arah belum tersedia. Gerakkan perangkat atau izinkan sensor kompas.','warn')});
+on('myLocation','click',async()=>{
+ try{
+  if(!GPS.start('maps'))throw new Error('GPS tidak dapat dimulai.');
+  await ensureLeaflet();initMap();const p=await getPos();
+  if(!NAV.map.hasLayer(NAV.user))NAV.user.addTo(NAV.map);
+  if(!NAV.map.hasLayer(NAV.acc))NAV.acc.addTo(NAV.map);
+  NAV.user.setLatLng([p.lat,p.lon]);NAV.acc.setLatLng([p.lat,p.lon]);NAV.acc.setRadius(Math.min(p.acc||0,200));
+  NAV.map.invalidateSize(true);NAV.map.setView([p.lat,p.lon],17,{animate:false});NAV.user.setZIndexOffset(1200);
+  if(NAV.user.bringToFront)NAV.user.bringToFront();
+  updateLocationIntel({lat:p.lat,lon:p.lon,acc:p.acc||999,hd:null,t:Date.now()});reverseLocation({lat:p.lat,lon:p.lon},true);
+ }catch(e){toast('Lokasi tidak dapat diakses: '+e.message,'err')}
+});
+on('copyLocation','click',()=>{if(!S.fix)return toast('GPS belum mendapatkan lokasi','warn');locCopy(S.fix.lat+', '+S.fix.lon)});
+on('copyAddress','click',()=>locCopy($('addrFull').textContent.replace(/^Alamat:\s*/,'')));
+on('shareLocation','click',async()=>{if(!S.fix)return toast('GPS belum mendapatkan lokasi','warn');const url='https://www.google.com/maps?q='+S.fix.lat+','+S.fix.lon;try{if(navigator.share)await navigator.share({title:'Lokasi saya',text:$('addrFull').textContent,url});else locCopy(url)}catch(e){}});
+on('saveFavorite','click',()=>{if(!S.fix)return toast('GPS belum mendapatkan lokasi','warn');const x={lat:S.fix.lat,lon:S.fix.lon,name:($('addrVillage').textContent!=='Data tidak tersedia'?$ ('addrVillage').textContent:'Lokasi tersimpan'),address:$('addrFull').textContent};LOC.favorites=[x,...LOC.favorites].slice(0,30);try{localStorage.setItem(LOC_FAV,JSON.stringify(LOC.favorites))}catch(e){}renderLocationLists();toast('Lokasi disimpan ke favorit')});
+on('favoriteLocations','click',e=>{
+ const d=e.target.closest('[data-fav-del]'),g=e.target.closest('[data-fav-go]');
+ if(d){LOC.favorites.splice(Number(d.dataset.favDel),1);localStorage.setItem(LOC_FAV,JSON.stringify(LOC.favorites));renderLocationLists()}
+ if(g){const x=LOC.favorites[Number(g.dataset.favGo)];if(x){NAV.map&&NAV.map.setView([x.lat,x.lon],17);$('destination').value=x.name;NAV.destInfo=x}}
+});
+on('locationHistory','click',e=>{const b=e.target.closest('[data-hist-go]');if(!b)return;const x=LOC.history[Number(b.dataset.histGo)];if(x){$('destination').value=x.name;NAV.destInfo=x;NAV.destQuery=x.name;searchRoute()}});
+/* Keep GPS updates linked to the intelligence panel without replacing the core GPS engine */
+const _navOnFix=navOnFix;
+navOnFix=function(f){_navOnFix(f);if(S.page==='maps'||NAV.active)updateLocationIntel(f)};
+renderLocationLists();ensureSuggestions();
+
+/* ========== boot ========== */
+safe('boot',()=>{
+ loadDraft();applyCfg();renderHistory();renderWpList();
+ const q=new URLSearchParams(location.search),dest=q.get('destination')||q.get('q')||q.get('geo');
+ if(dest){$('destination').value=dest;go('maps');setTimeout(searchRoute,500)}
+ else showPage(location.hash.slice(1)||'home');
+ if(cfg.autoGps&&navigator.permissions&&window.isSecureContext)navigator.permissions.query({name:'geolocation'}).then(p=>{if(p.state==='granted')GPS.start('speed')}).catch(()=>{});
+ log('Siap · fitur dimuat ulang dari penyimpanan lokal');
+});
+</script>
+<script>
+
+/* NAVIXU3 GPS-only fullscreen + live map mode */
+(function(){
+ const toggle=$('gpsOnlyToggle'), exit=$('gpsOnlyExit'), center=$('gpsOnlyCenter');
+ async function enterGpsOnly(){
+  try{
+   await ensureLeaflet();initMap();
+   if(!GPS.start('maps-live'))throw new Error('GPS tidak dapat dimulai. Periksa izin lokasi dan HTTPS.');
+   document.body.classList.add('gps-only-mode');
+   try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}
+   setTimeout(()=>{if(NAV.map){NAV.map.invalidateSize();if(S.fix)NAV.map.setView([S.fix.lat,S.fix.lon],17)}} ,350);
+  }catch(e){toast(e.message,'err')}
+ }
+ async function leaveGpsOnly(){
+  document.body.classList.remove('gps-only-mode');
+  if(document.fullscreenElement){try{await document.exitFullscreen()}catch(e){}}
+  GPS.stop('maps-live');
+  setTimeout(()=>NAV.map&&NAV.map.invalidateSize(),250);
+ }
+ if(toggle)toggle.addEventListener('click',enterGpsOnly);
+ if(exit)exit.addEventListener('click',leaveGpsOnly);
+ if(center)center.addEventListener('click',async()=>{
+  try{if(!S.fix)await getPos();if(S.fix&&NAV.map)NAV.map.setView([S.fix.lat,S.fix.lon],18);else if(NAV.map){const p=await getPos();NAV.map.setView([p.lat,p.lon],18)}}catch(e){toast('Lokasi belum tersedia: '+e.message,'err')}
+ });
+ document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement&&document.body.classList.contains('gps-only-mode'))document.body.classList.remove('gps-only-mode');
+  setTimeout(()=>NAV.map&&NAV.map.invalidateSize(),250);
+ });
+ const priorShowPage=showPage;
+ showPage=async function(name){
+  await priorShowPage(name);
+  if(name==='maps'){
+   try{await openMaps();if(!S.fix)GPS.start('maps-live');setTimeout(()=>NAV.map&&NAV.map.invalidateSize(),250)}
+   catch(e){log('Map auto-start: '+e.message)}
+  }else if(GPS.users.has('maps-live'))GPS.stop('maps-live');
+ };
+})();
+
+</script>
+<script>
+
+/* NAVIXU3 GITHUB PAGES COMPATIBILITY + DATA VAULT
+   Static hosting has no shared database. Existing app data stays local to this browser.
+   JSON export/import provides portable backup without changing existing modules. */
+(function(){
+ 'use strict';
+ const PREFIX='navixu3';
+ const $id=id=>document.getElementById(id);
+ const status=(s)=>{const e=$id('navBackupStatus');if(e)e.textContent=s};
+ const safeName=()=> 'NAVIXU3_BACKUP_'+new Date().toISOString().slice(0,10)+'.json';
+ function collect(){
+  const data={};
+  for(let i=0;i<localStorage.length;i++){
+   const k=localStorage.key(i);
+   if(k && k.toLowerCase().startsWith(PREFIX)) data[k]=localStorage.getItem(k);
+  }
+  return {format:'NAVIXU3_BACKUP',version:1,createdAt:new Date().toISOString(),origin:location.origin,items:data};
+ }
+ function exportBackup(){
+  try{
+   const payload=collect(), count=Object.keys(payload.items).length;
+   if(!count){status('Belum ada data NAVIXU3 untuk dicadangkan.');return}
+   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=safeName();document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1500);
+   status('BACKUP BERHASIL · '+count+' ITEM DATA · '+new Date().toLocaleString('id-ID'));
+  }catch(e){status('Gagal membuat backup: '+e.message)}
+ }
+ async function importBackup(file){
+  if(!file)return;
+  try{
+   const raw=await file.text(),p=JSON.parse(raw);
+   if(!p||p.format!=='NAVIXU3_BACKUP'||!p.items||typeof p.items!=='object'||Array.isArray(p.items))throw new Error('Format file bukan backup NAVIXU3 yang valid.');
+   const entries=Object.entries(p.items).filter(([k,v])=>typeof k==='string'&&k.toLowerCase().startsWith(PREFIX)&&typeof v==='string');
+   if(!entries.length)throw new Error('Backup tidak berisi data NAVIXU3.');
+   if(!confirm('Pulihkan '+entries.length+' item data dari backup? Data dengan nama kunci sama akan ditimpa.'))return;
+   // Validate quota before writing and keep a rollback copy for failed restores.
+   const rollback={};for(const [k] of entries)rollback[k]=localStorage.getItem(k);
+   try{for(const [k,v] of entries)localStorage.setItem(k,v)}
+   catch(writeErr){for(const [k,v] of Object.entries(rollback)){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(_){}}throw writeErr}
+   status('RESTORE BERHASIL · '+entries.length+' ITEM · Muat ulang halaman untuk menerapkan seluruh data.');
+   alert('Backup berhasil dipulihkan. Halaman akan dimuat ulang agar semua modul membaca data terbaru.');
+   location.reload();
+  }catch(e){status('Restore gagal: '+e.message);alert('Tidak dapat memulihkan backup: '+e.message)}
+ }
+ async function storageCheck(){
+  try{
+   let estimate='Estimasi kuota tidak didukung browser.';
+   if(navigator.storage&&navigator.storage.estimate){
+    const x=await navigator.storage.estimate();
+    const mb=n=> (n/1048576).toFixed(2)+' MB';
+    estimate='Terpakai '+mb(x.usage||0)+' / kuota '+mb(x.quota||0);
+   }
+   let persisted='';
+   if(navigator.storage&&navigator.storage.persist){
+    const ok=await navigator.storage.persist();
+    persisted=ok?' · penyimpanan persisten diizinkan':' · browser belum memberi status persisten';
+   }
+   const count=Object.keys(collect().items).length;
+   status('PENYIMPANAN OK · '+count+' ITEM · '+estimate+persisted);
+  }catch(e){status('Status penyimpanan: '+e.message)}
+ }
+ const exp=$id('navBackupExport'),imp=$id('navBackupImportBtn'),file=$id('navBackupFile'),check=$id('navStorageCheck');
+ if(exp)exp.addEventListener('click',exportBackup);
+ if(imp&&file)imp.addEventListener('click',()=>file.click());
+ if(file)file.addEventListener('change',()=>{const f=file.files&&file.files[0];if(f)importBackup(f);file.value=''});
+ if(check)check.addEventListener('click',storageCheck);
+ // Request persistent storage where supported; never block app startup.
+ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+ addEventListener('pagehide',()=>{try{sessionStorage.setItem('navixu3_last_exit',new Date().toISOString())}catch(_){}});
+ addEventListener('error',e=>{try{const k='navixu3_runtime_errors_v1',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({at:new Date().toISOString(),message:String(e.message||'Unknown error'),file:String(e.filename||'').slice(-120),line:e.lineno||0});localStorage.setItem(k,JSON.stringify(a.slice(-30)))}catch(_){}});
+ addEventListener('unhandledrejection',e=>{try{const k='navixu3_runtime_errors_v1',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({at:new Date().toISOString(),message:String(e.reason&&e.reason.message||e.reason||'Unhandled rejection')});localStorage.setItem(k,JSON.stringify(a.slice(-30)))}catch(_){}});
+ status('LOCAL STORAGE READY · DATA TERSIMPAN DI BROWSER INI');
+})();
+
+</script>
+
+<script>
+/* Honest routing notice: static map tags are not live traffic or pavement sensors. */
+(function(){
+ const n=document.createElement('div');
+ n.id='navixu3RoadTruthNotice';
+ n.style.cssText='position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden';
+ n.textContent='Kondisi fisik jalan tidak tersedia sebagai data live. Audit memakai tag OpenStreetMap bila tersedia; jalan tanpa data ditandai tidak diketahui.';
+ document.body.appendChild(n);
+})();
+</script>
+
+<script>
+(function(){
+ 'use strict';
+ // Keep this value identical to ./version.json. This package is 4.1.0.
+ const APP_VERSION='4.3.0', manifestUrl=new URL('./version.json',location.href).href;
+ const $=id=>document.getElementById(id);let busy=false,available=false,release=null;
+ const cmp=(a,b)=>{const x=String(a).split('.').map(n=>parseInt(n,10)||0),y=String(b).split('.').map(n=>parseInt(n,10)||0);for(let i=0;i<Math.max(x.length,y.length);i++){if((x[i]||0)>(y[i]||0))return 1;if((x[i]||0)<(y[i]||0))return -1}return 0};
+ const stamp=()=>new Date().toLocaleString('id-ID');
+ function required(version){
+  if($('navixu3RequiredUpdate'))return;
+  const d=document.createElement('div');d.id='navixu3RequiredUpdate';
+  d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(3,7,18,.96);display:grid;place-items:center;padding:22px;color:white;text-align:center';
+  d.innerHTML='<div style="max-width:440px;padding:24px;border:1px solid var(--neon);border-radius:18px;background:#101827"><h2>PEMBARUAN WAJIB</h2><p>Versi terbaru tersedia: <b></b></p><p>Ekspor/backup perjalanan sebelum menerapkan pembaruan.</p><p id="navUpdateApplyStatus" role="status" aria-live="polite"></p><button id="navUpdateRequiredApply" class="primary">TERAPKAN UPDATE</button></div>';
+  d.querySelector('b').textContent=version;document.body.appendChild(d);d.querySelector('button').onclick=apply;
+ }
+ function apply(){
+  if(!available||!release||busy)return;
+  const button=$('navUpdateRequiredApply');if(button){button.disabled=true;button.textContent='MEMBUKA VERSI TERBARU…'}
+  const status=$('navUpdateApplyStatus');if(status)status.textContent='Memuat ulang dari server. Data lokal tidak dihapus.';
+  const u=new URL(release.url||'./',location.href);u.searchParams.set('r3pro_update',String(Date.now()));
+  // Navigation requests are network-first in the bundled service worker.
+  location.replace(u.href);
+ }
+ async function check(){
+  if(busy)return;busy=true;
+  const status=$('navUpdateStatus');if(status)status.textContent='MEMERIKSA SERVER…';
+  try{
+   const r=await fetch(manifestUrl+(manifestUrl.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});if(!r.ok)throw new Error('HTTP '+r.status);
+   const j=await r.json();if(!j.version)throw new Error('Versi tidak ditemukan');
+   release=j;$('navUpdateInstalled').textContent=APP_VERSION;$('navUpdateLatest').textContent=j.version;$('navUpdateChecked').textContent=stamp();$('navUpdateNotes').textContent=j.notes||'Tidak ada catatan rilis.';
+   const relation=cmp(j.version,APP_VERSION);available=relation>0;
+   $('navUpdateStatus').textContent=available?'UPDATE WAJIB TERSEDIA':(relation<0?'MANIFEST LEBIH LAMA DARI APLIKASI':'APLIKASI TERBARU');
+   $('navUpdateApply').hidden=!available;
+   if(available)required(j.version);else{const d=$('navixu3RequiredUpdate');if(d)d.remove()}
+  }catch(e){
+   if(status)status.textContent='PEMERIKSAAN GAGAL · UPDATE TIDAK DIKUNCI';
+   $('navUpdateChecked').textContent=stamp();$('navUpdateNotes').textContent='Tidak dapat memverifikasi versi server: '+e.message+'. Coba periksa kembali saat internet tersedia.';
+   // Fail open: a network error must never trap the user behind a mandatory popup.
+   const d=$('navixu3RequiredUpdate');if(d)d.remove();available=false;$('navUpdateApply').hidden=true;
+  }finally{busy=false}
+ }
+ $('navUpdateCheck').addEventListener('click',check);$('navUpdateApply').addEventListener('click',apply);
+ check();setInterval(check,300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+ if('serviceWorker' in navigator&&location.protocol==='https:')addEventListener('load',async()=>{
+  try{const reg=await navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});await reg.update()}catch(e){console.warn('R3PRO service worker update:',e)}
+ });
+})();
+</script>
+
+
+<script id="navixu3-v4-runtime">
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const put=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+ const fmtTime=()=>new Date().toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ const wxText=c=>({0:'Cerah',1:'Cerah berawan',2:'Berawan sebagian',3:'Berawan',45:'Kabut',48:'Kabut tebal',51:'Gerimis ringan',53:'Gerimis',55:'Gerimis lebat',56:'Gerimis beku',57:'Gerimis beku lebat',61:'Hujan ringan',63:'Hujan',65:'Hujan lebat',66:'Hujan beku',67:'Hujan beku lebat',71:'Salju ringan',73:'Salju',75:'Salju lebat',77:'Butiran salju',80:'Hujan lokal',81:'Hujan lokal',82:'Hujan lokal lebat',85:'Salju lokal',86:'Salju lokal lebat',95:'Badai petir',96:'Badai petir + hujan es',99:'Badai petir kuat'})[c]||'Kondisi tidak diketahui';
+ const saved=()=>{try{return JSON.parse(localStorage.getItem('navixu3_v4_weather')||'null')}catch(e){return null}};
+ const renderWeather=(w,stale=false)=>{
+  if(!w)return;put('v4Temp',Math.round(w.temperature_2m)+' °C');put('v4Feels',Math.round(w.apparent_temperature)+' °C');put('v4WeatherText',wxText(w.weather_code));put('v4Humidity',Math.round(w.relative_humidity_2m)+'%');put('v4Wind',Math.round(w.wind_speed_10m)+' km/j');put('v4Rain',Number(w.precipitation||0).toFixed(1)+' mm');put('v4Cloud',Number.isFinite(+w.cloud_cover)?Math.round(w.cloud_cover)+'%':'--%');put('v4RainChance',w.precipitation_probability!=null&&Number.isFinite(+w.precipitation_probability)?Math.round(w.precipitation_probability)+'%':'--%');put('v4Thunder',w.thunderstorm_probability!=null&&Number.isFinite(+w.thunderstorm_probability)?Math.round(w.thunderstorm_probability)+'%':'--%');const alert=$('v4WeatherAlert');if(alert){const code=+w.weather_code,th=+(w.thunderstorm_probability??0),rain=+w.precipitation,cloud=+w.cloud_cover,rainChance=+(w.precipitation_probability??0);let msg='KONDISI NORMAL · Tetap perhatikan perubahan cuaca.';let cls='';if([95,96,99].includes(code)||th>=50){msg='PERINGATAN PETIR · Model cuaca mendeteksi potensi badai petir. Cari tempat aman dan pantau kondisi setempat.';cls='danger'}else if(rain>0||rainChance>=60||[51,53,55,61,63,65,80,81,82].includes(code)){msg='INFO HUJAN · Terdapat indikasi hujan/curah hujan pada data cuaca.';cls='warn'}else if(cloud>=75){msg='INFO AWAN TEBAL · Tutupan awan tinggi di sekitar lokasi.';cls='warn'}alert.textContent=msg;alert.className='wx-alert '+cls;}put('v4WeatherState',stale?'DATA TERSIMPAN':'TERBARUI');put('v4WeatherUpdated',(stale?'Data terakhir tersimpan · ':'Diperbarui · ')+(w._at||fmtTime()));
+ };
+ async function refreshWeather(){
+  const lat=parseFloat(($('locLat')?.textContent||'').replace(',','.')),lon=parseFloat(($('locLon')?.textContent||'').replace(',','.'));
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){put('v4WeatherState','MENUNGGU GPS');put('v4WeatherUpdated','Aktifkan GPS untuk mengambil cuaca di lokasi.');return}
+  if(!navigator.onLine){renderWeather(saved(),true);put('v4WeatherState','OFFLINE');return}
+  put('v4WeatherState','MENGAMBIL DATA…');
+  const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,cloud_cover&hourly=precipitation_probability,thunderstorm_probability&forecast_days=1&timezone=auto';
+  try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.current)throw new Error('Data cuaca tidak tersedia');const now=new Date(),times=j.hourly?.time||[];let hi=0;if(times.length){let best=Infinity;times.forEach((t,i)=>{const d=Math.abs(new Date(t).getTime()-now.getTime());if(d<best){best=d;hi=i}})}const w={...j.current,precipitation_probability:j.hourly?.precipitation_probability?.[hi]??null,thunderstorm_probability:j.hourly?.thunderstorm_probability?.[hi]??null,_at:fmtTime()};localStorage.setItem('navixu3_v4_weather',JSON.stringify(w));renderWeather(w,false)}catch(e){const old=saved();if(old)renderWeather(old,true);put('v4WeatherState','GAGAL MEMUAT');put('v4WeatherUpdated','Cek internet. '+e.message)}
+ }
+ $('v4WeatherRefresh')?.addEventListener('click',refreshWeather);
+ let weatherTimer=0;const locObserver=$('locLat');if(locObserver&&'MutationObserver'in window){new MutationObserver(()=>{clearTimeout(weatherTimer);weatherTimer=setTimeout(refreshWeather,1200)}).observe(locObserver,{childList:true,characterData:true,subtree:true})}
+ if(saved())renderWeather(saved(),true);
+ window.addEventListener('online',refreshWeather);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWeather()});setInterval(()=>{if(document.visibilityState==='visible')refreshWeather()},15*60*1000);
+ $('v4AssistRefresh')?.addEventListener('click',()=>{
+  const lat=$('locLat')?.textContent||'--',lon=$('locLon')?.textContent||'--',speed=$('homeSpeed')?.textContent||'--',dist=$('homeDist')?.textContent||'0.00 km',eta=$('navEta')?.textContent||'--',instruction=$('navInstruction')?.textContent||'Belum ada rute';
+  const text='Posisi: '+lat+', '+lon+'. Kecepatan: '+speed+'. Jarak trip: '+dist+'. Petunjuk: '+instruction+'. Estimasi: '+eta+'. '+(navigator.onLine?'Internet terhubung.':'Perangkat offline.');put('v4AssistText',text);
+ });
+ $('v4ShareTrip')?.addEventListener('click',async()=>{
+  const lat=$('locLat')?.textContent||'',lon=$('locLon')?.textContent||'';if(!lat||!lon||lat==='--'||lon==='--'){put('v4AssistText','Lokasi belum tersedia. Aktifkan GPS terlebih dahulu.');return}
+  const url='https://www.google.com/maps?q='+encodeURIComponent(lat+','+lon),data={title:'Lokasi NAVIXU3',text:'Lokasi saya: '+lat+', '+lon,url};
+  try{if(navigator.share)await navigator.share(data);else if(navigator.clipboard){await navigator.clipboard.writeText(data.text+'\n'+url);put('v4AssistText','Tautan lokasi berhasil disalin.')}else window.prompt('Salin tautan lokasi',url)}catch(e){if(e.name!=='AbortError')put('v4AssistText','Bagikan lokasi dibatalkan atau tidak didukung browser.')}
+ });
+ // PWA install prompt. Availability is browser-controlled; no fake install success.
+ let installPrompt=null;const installBtn=$('v4Install');
+ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;if(installBtn)installBtn.hidden=false});
+ installBtn?.addEventListener('click',async()=>{if(!installPrompt){put('v4AssistText','Jika tombol instal tidak tersedia, buka menu browser lalu pilih Tambahkan ke layar utama.');return}installPrompt.prompt();const choice=await installPrompt.userChoice;put('v4AssistText',choice.outcome==='accepted'?'Permintaan pemasangan diterima browser.':'Pemasangan belum dipilih.');installPrompt=null;installBtn.hidden=true});
+ window.addEventListener('appinstalled',()=>{if(installBtn)installBtn.hidden=true;put('v4AssistText','NAVIXU3 berhasil dipasang sebagai aplikasi.');});
+ if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('PWA worker:',e)));
+})();
+</script>
+
+
+<script id="r3pro-phone-link-module">
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const permissionText=()=>{
+  const el=$('rpBrowserPermission'); if(!el)return;
+  if(!('Notification' in window)){el.textContent='Browser ini tidak mendukung Web Notifications.';return;}
+  el.textContent='Izin notifikasi browser: '+Notification.permission+'. Ini hanya izin untuk notifikasi R3PRO pada perangkat yang sedang membuka halaman ini.';
+ };
+ const notify=(title,body)=>{
+  if(!('Notification' in window)||Notification.permission!=='granted')return false;
+  try{new Notification(title,{body,icon:'./navixu3-192.png',tag:'r3pro-phone-link-test'});return true;}catch(_){return false;}
+ };
+ const logEvent=(title,body)=>{
+  const list=$('rpEventList'); if(!list)return;
+  const empty=list.querySelector('.notice'); if(empty)empty.remove();
+  const item=document.createElement('div');item.className='rp-event';
+  const strong=document.createElement('strong');strong.textContent=title;
+  const small=document.createElement('small');small.textContent=body+' · '+new Date().toLocaleString('id-ID');
+  item.append(strong,small);list.prepend(item);
+  if(list.querySelectorAll('.rp-event').length>30)list.lastElementChild.remove();
+  const metric=$('rpNotifMetric');if(metric)metric.textContent=String(list.querySelectorAll('.rp-event').length);
+ };
+ $('rpNotifPermission')?.addEventListener('click',async()=>{
+  if(!('Notification' in window)){permissionText();return;}
+  try{const result=await Notification.requestPermission();permissionText();if(result==='granted')logEvent('Izin browser aktif','Perangkat ini dapat menerima notifikasi lokal dari R3PRO.');}
+  catch(_){if($('rpBrowserPermission'))$('rpBrowserPermission').textContent='Permintaan izin gagal atau diblokir browser.';}
+ });
+ $('rpTestNotif')?.addEventListener('click',()=>{
+  if(!('Notification' in window)){permissionText();return;}
+  if(Notification.permission!=='granted'){permissionText();if($('rpBrowserPermission'))$('rpBrowserPermission').textContent+=' Tekan Aktifkan Notifikasi Browser terlebih dahulu.';return;}
+  const ok=notify('R3PRO PHONE LINK','Ini notifikasi tes lokal. Belum berasal dari HP lain.');
+  logEvent('TES NOTIFIKASI LOKAL',ok?'Notifikasi browser berhasil diminta.':'Browser tidak menampilkan notifikasi.');
+ });
+ $('rpClearEvents')?.addEventListener('click',()=>{
+  const list=$('rpEventList');if(list)list.innerHTML='<div class="notice">Riwayat lokal dibersihkan. Belum ada notifikasi dari perangkat lain.</div>';
+  if($('rpNotifMetric'))$('rpNotifMetric').textContent='0';
+ });
+ permissionText();
+})();
+</script>
+
+
+<script id="r3pro-phone-link-pairing-v420">
+(()=>{'use strict';
+ const $=id=>document.getElementById(id); if(!$('rpCreatePair'))return;
+ const state={ws:null,token:null,deviceId:null,pairCode:null,joinCode:null,qrLib:false};
+ const say=t=>{const e=$('rpPairHelp');if(e)e.textContent=t;};
+ const relayUrl=()=>($('rpRelayUrl').value||'').trim().replace(/\/$/,'');
+ const setRelay=s=>{if($('rpRelayState'))$('rpRelayState').textContent=s;};
+ const setLive=s=>{if($('rpLiveMetric'))$('rpLiveMetric').textContent=s;if($('rpLinkMetric'))$('rpLinkMetric').textContent=s;};
+ const loadQR=()=>new Promise((resolve,reject)=>{if(window.QRCode)return resolve();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.onload=()=>window.QRCode?resolve():reject(Error('Library QR tidak tersedia'));sc.onerror=()=>reject(Error('Gagal memuat generator QR'));document.head.appendChild(sc);});
+ async function api(path,data){const base=relayUrl();if(!base)throw Error('Isi alamat server relay terlebih dahulu.');const http=base.replace(/^wss:/,'https:').replace(/^ws:/,'http:');const r=await fetch(http+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'Permintaan relay gagal ('+r.status+')');return j;}
+ function connect(token){const base=relayUrl();if(!base)throw Error('Alamat relay belum diisi.');if(state.ws)state.ws.close();const ws=new WebSocket(base+'?token='+encodeURIComponent(token));state.ws=ws;ws.onopen=()=>{setRelay('TERHUBUNG');setLive('ONLINE');say('Relay aktif. Perangkat siap menerima event yang diizinkan.');};ws.onclose=()=>{setRelay('TERPUTUS');setLive('OFFLINE');};ws.onerror=()=>{setRelay('ERROR');say('Koneksi relay gagal. Periksa URL, HTTPS/WSS, dan status server.');};ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}if(m.type==='paired'){if($('rpPairMetric'))$('rpPairMetric').textContent='TERPASANG';say('Pairing berhasil. Kedua perangkat telah tersambung.');return;}if(m.type==='event'){const title=String(m.title||'Notifikasi perangkat').slice(0,100),body=String(m.body||'').slice(0,500);const feed=$('rpEventList');if(feed){const empty=feed.querySelector('.notice');if(empty)empty.remove();const row=document.createElement('div');row.className='diag-item';const h=document.createElement('strong');h.textContent='REMOTE · '+title;const d=document.createElement('small');d.textContent=body+' · '+new Date().toLocaleString('id-ID');row.append(h,d);feed.prepend(row);if(feed.querySelectorAll('.diag-item').length>30)feed.lastElementChild.remove();const n=$('rpNotifMetric');if(n)n.textContent=String(feed.querySelectorAll('.diag-item').length);}if('Notification'in window&&Notification.permission==='granted'){try{new Notification(title,{body,icon:'./navixu3-192.png'})}catch(_){}}}};}
+ $('rpCreatePair').addEventListener('click',async()=>{try{const r=await api('/api/pair/create',{label:'R3PRO '+(navigator.userAgentData?.platform||'Device')});state.token=r.token;state.pairCode=r.code;const joinUrl=location.origin+location.pathname+'#r3pair='+encodeURIComponent(r.code);await loadQR();$('rpQrCode').innerHTML='';new QRCode($('rpQrCode'),{text:joinUrl,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});$('rpQrWrap').hidden=false;$('rpPairCode').textContent='KODE: '+r.code;$('rpPairStatus').textContent='MENUNGGU SCAN';if($('rpPairMetric'))$('rpPairMetric').textContent='MENUNGGU';connect(r.token);say('QR berhasil dibuat. Scan dari HP kedua, lalu setujui pairing pada HP kedua.');}catch(e){say('Gagal membuat QR: '+e.message);}});
+ $('rpConnectRelay').addEventListener('click',()=>{try{if(!state.token){say('Buat atau setujui pairing terlebih dahulu.');return;}connect(state.token)}catch(e){say(e.message)}});
+ $('rpDisconnect').addEventListener('click',()=>{if(state.ws)state.ws.close();state.ws=null;state.token=null;setLive('OFFLINE');setRelay('TERPUTUS');say('Koneksi perangkat diputus dari halaman ini.');});
+ const hash=location.hash.match(/(?:^#|&)r3pair=([^&]+)/);if(hash){state.joinCode=decodeURIComponent(hash[1]);history.replaceState(null,'',location.pathname+location.search);$('rpJoinPrompt').hidden=false;$('rpApproveJoin').hidden=false;$('rpCancelJoin').hidden=false;$('rpPairStatus').textContent='PERMINTAAN MASUK';say('Kode pairing ditemukan. Periksa dan setujui hanya jika kamu memulai proses ini pada perangkat pertama.');}
+ $('rpApproveJoin').addEventListener('click',async()=>{try{const r=await api('/api/pair/join',{code:state.joinCode,label:'R3PRO Android'});state.token=r.token;$('rpJoinPrompt').hidden=true;$('rpApproveJoin').hidden=true;$('rpCancelJoin').hidden=true;if($('rpPairMetric'))$('rpPairMetric').textContent='TERPASANG';connect(r.token);say('Pairing disetujui. Hubungkan relay pada perangkat pertama juga.');}catch(e){say('Pairing ditolak/gagal: '+e.message);}});
+ $('rpCancelJoin').addEventListener('click',()=>{$('rpJoinPrompt').hidden=true;$('rpApproveJoin').hidden=true;$('rpCancelJoin').hidden=true;state.joinCode=null;say('Permintaan pairing ditolak.');});
+ // Explicit, user-triggered test event only; remote notifications require the companion app to send authorized events.
+ window.R3PROPhoneLinkSendEvent=(title,body)=>{if(!state.ws||state.ws.readyState!==WebSocket.OPEN)return false;state.ws.send(JSON.stringify({type:'event',title:String(title||'Notifikasi').slice(0,100),body:String(body||'').slice(0,500)}));return true;};
+ if($('rpRelayUrl'))$('rpRelayUrl').addEventListener('change',()=>{try{localStorage.setItem('r3pro_relay_url',$('rpRelayUrl').value.trim())}catch(_){}});
+ try{const saved=localStorage.getItem('r3pro_relay_url');if(saved)$('rpRelayUrl').value=saved}catch(_){}
+})();
+</script>
+
+</body>
+</html>
