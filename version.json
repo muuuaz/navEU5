@@ -1,0 +1,6 @@
+{
+  "version": "4.4.1",
+  "releaseDate": "2026-11-28",
+  "notes": "R3PRO 4.4.1: disables blocking mandatory update modal; aligns app and manifest versions; starts GPS tracking on Weather page; live weather map marker follows GPS fixes; weather refreshes on meaningful movement with a 5-minute throttle. GPS requires HTTPS and permission. Weather model refresh remains provider-limited; radar refresh remains periodic.",
+  "url": "./"
+}
