@@ -1,6 +1,0 @@
-{
-  "version": "1.0.0",
-  "releaseDate": "2026-11-27",
-  "notes": "Rilis awal sistem pemeriksaan versi otomatis NAVIXU3. Pemeriksaan berjalan saat aplikasi dibuka dan setiap 5 menit.",
-  "url": "./"
-}
